@@ -45,8 +45,17 @@ class _TaskState extends State<Task> {
    }
 
 
+  Color checado(Set<WidgetState> states){
+
+    if(widget.model.concluida){
+      return Colors.green;
+    }
+    return Colors.transparent;
+  }
+
   @override
   Widget build(BuildContext context) {
+
 
  
     return Slidable(
@@ -130,48 +139,67 @@ class _TaskState extends State<Task> {
      ),
         child: Container(
           width: 500,
-        child: Card(
-          child: Row(
-            mainAxisAlignment: MainAxisAlignment.spaceBetween,
-            children: [
-              SizedBox(
-               width: 15,
-              ),
-              Expanded(
-                child: Column(
-                  mainAxisAlignment: MainAxisAlignment.center,
-                  crossAxisAlignment: CrossAxisAlignment.start,
-                  children: [
-                   Text("    " + Date,
-                   style: TextStyle(
-                    color: widget.model.concluida ==false? Colors.black: Colors.green
-                   )),
-                   SizedBox(height: 2,),
-                   ListTile(
-                     title: Text(widget.model.text ?? "null",
-                     style: TextStyle(fontSize:19, 
-                     fontWeight: FontWeight.bold,
-                     color: widget.model.concluida == false? Colors.black : Colors.green
-                     )),
-                     subtitle: Text(widget.model.concluida==false? "PENDENTE":"CONCLUIDA",
-                     style: TextStyle(color: widget.model.concluida==false? Colors.red : Colors.green)),
-                   ),
-                   SizedBox(height: 1,)
-                  ],
+        child: Padding(
+          padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 5),
+          child: Card(
+            child: Row(
+              mainAxisAlignment: MainAxisAlignment.spaceBetween,
+              children: [
+                SizedBox(
+                 width: 15,
                 ),
-              ),
-             // SizedBox(width: 150,),
-              Checkbox(value: widget.model.concluida, 
-              onChanged:(bool? newValue){
-                 setState(() {
-                   widget.model.concluida = newValue!;
-                 });
-                 if(widget.OnChaged != null){
-                  widget.OnChaged!();
-                 }
-              } )
-            ],
-          )
+                Expanded(
+                  child: Column(
+                    mainAxisAlignment: MainAxisAlignment.center,
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    children: [
+
+                       ListTile(
+                       title: Text(widget.model.text ?? "null",
+                       style: TextStyle(fontSize:19, 
+                       fontWeight: FontWeight.bold,
+                       color: widget.model.concluida == false? (widget.model.isDark?Colors.white:Colors.black): Colors.green
+                       )),
+    
+                       subtitle: Column(
+                        crossAxisAlignment: CrossAxisAlignment.start,
+                         children: [
+                           Text("" + Date,
+                     style: TextStyle(
+                      color: widget.model.concluida ==false? (widget.model.isDark?Colors.white: Colors.black) : Colors.green
+                     )),
+                     SizedBox(height: 2,),
+                           Text(widget.model.concluida==false? "STATUS: PENDENTE":"STATUS: CONCLUIDA",
+                           style: TextStyle(color: widget.model.concluida==false? Colors.red : Colors.green)),
+                           
+                         ],
+                       ),
+                     ),
+                    
+                     SizedBox(height: 2,),
+                    
+                     SizedBox(height: 1,)
+                    ],
+                  ),
+                ),
+               // SizedBox(width: 150,),
+                Checkbox(value: widget.model.concluida, 
+                onChanged:(bool? newValue){
+                   setState(() {
+                     widget.model.concluida = newValue!;
+                   });
+                   if(widget.OnChaged != null){
+                    widget.OnChaged!();
+                   }
+                },
+
+                fillColor: WidgetStateColor.resolveWith(checado)
+                ,
+                
+                 )
+              ],
+            )
+          ),
         ),
         ),
 
