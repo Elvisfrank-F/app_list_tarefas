@@ -7,9 +7,14 @@ import 'task.dart';
 
 import 'package:flutter/material.dart';
 
+import 'package:tarefas/repositories/settings.dart';
+
 final ValueNotifier<ThemeMode> themeNotifier = ValueNotifier(ThemeMode.light);
 
-void main() {
+void main() async{
+
+  final isDark = await Settings.getDarkMode();
+
   runApp(
     ValueListenableBuilder<ThemeMode>(
       valueListenable: themeNotifier,
@@ -59,25 +64,44 @@ class _HomePageState extends State<HomePage> {
 
   final TaskRepo taskrepo = TaskRepo();
 
-  bool isDark = false;
+  //carregar tema
+
+  void carregarTema() async {
+    final isDark = await Settings.getDarkMode();
+    themeNotifier.value = isDark? ThemeMode.dark : ThemeMode.light;
+  }
+
+  //alterar o tema
+
+  void alterarTema() async {
+    final isDark = await Settings.getDarkMode();
+    themeNotifier.value = isDark ? ThemeMode.light : ThemeMode.dark;
+    await Settings.setDarkMode(!isDark);
+  }
+
+
 
   @override
   void initState(){
     super.initState();
 
+    //carregar o tema que o usuário escolheu
 
-    
+    carregarTema();
+
+    //carregar as tarefas antigas
 
     taskrepo.getTaskList().then(
       (value){
         setState(() {
           tarefas = value;
           
-          if(tarefas.length>0){
-            if(tarefas[0].isDark){
-              themeNotifier.value = ThemeMode.dark;
-            }
-          }
+          // if(tarefas.length>0){
+          //   if(tarefas[0].isDark){
+          //     themeNotifier.value = ThemeMode.dark;
+          //   }
+          // }
+
 
         });
         
@@ -120,7 +144,48 @@ class _HomePageState extends State<HomePage> {
         mainAxisAlignment: MainAxisAlignment.spaceBetween,
         children: [
           Text(""),
-          isDart()?Icon(Icons.bedtime):Icon(Icons.brightness_4),
+          Row(
+            children: [
+              GestureDetector(
+                onTap:(){
+               showDialog(context: context, builder: (context){
+
+                return AlertDialog(
+                  title: Text("Dê um nome para sua lista de tarefas"),
+                  content: TextField(
+                    decoration: InputDecoration(
+                      border:OutlineInputBorder(),
+                      label: Text("nome"),
+                    ),
+                  ),
+                  actions: [
+
+                    //botão de cancelar
+
+                    TextButton(
+                      onPressed: (){
+                       Navigator.of(context).pop();
+                      }, 
+                      child: Text("Cancelar")),
+
+                      //Botão de ok
+                    TextButton(
+                      onPressed: (){
+                       Navigator.of(context).pop();
+                      }, 
+                      child: Text("Salvar")),
+                  ],
+                  
+                );
+
+               });
+
+                },
+                child: Icon(Icons.save)),
+              SizedBox(width: 20,),
+              isDart()?Icon(Icons.bedtime):Icon(Icons.brightness_4),
+            ],
+          ),
           
         ],
       )),
@@ -152,7 +217,8 @@ class _HomePageState extends State<HomePage> {
               
                       Switch(value: themeNotifier.value == ThemeMode.dark,
                        onChanged: (value){
-                        themeNotifier.value = value ? ThemeMode.dark : ThemeMode.light;
+                        alterarTema();
+                        //themeNotifier.value = value ? ThemeMode.dark : ThemeMode.light;
                         for(int i=0;i<tarefas.length;i++){
                           if(isDart()){
                             tarefas[i].isDark = true;
