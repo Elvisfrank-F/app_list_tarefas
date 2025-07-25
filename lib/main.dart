@@ -13,7 +13,7 @@ final ValueNotifier<ThemeMode> themeNotifier = ValueNotifier(ThemeMode.light);
 
 void main() async{
 
-  final isDark = await Settings.getDarkMode();
+  //final isDark = await Settings.getDarkMode();
 
   runApp(
     ValueListenableBuilder<ThemeMode>(
@@ -37,6 +37,7 @@ class HomePage extends StatefulWidget {
 
   @override
   State<HomePage> createState() => _HomePageState();
+  
 }
 
 class _HomePageState extends State<HomePage> {
