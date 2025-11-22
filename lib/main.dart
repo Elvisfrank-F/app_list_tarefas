@@ -45,6 +45,14 @@ class _HomePageState extends State<HomePage> {
   int get qtdTask => tarefas.length;
 
   final FocusNode _focusNode = FocusNode();
+
+  //controller para salvar a list
+
+  TextEditingController _controllerSalveList = TextEditingController();
+
+  //string para dizer o nome da lista
+
+  String? _nameList;
   
 
   //função que retorna a quantidade de atividades pendentes
@@ -60,7 +68,7 @@ class _HomePageState extends State<HomePage> {
 
   //instanciando o repositório para armazenagem e reciclagem de dados
 
-  final TaskRepo taskrepo = TaskRepo();
+   TaskRepo taskrepo = TaskRepo("nulo");
 
   //carregar tema
 
@@ -82,6 +90,7 @@ class _HomePageState extends State<HomePage> {
   @override
   void initState(){
     super.initState();
+    taskrepo = TaskRepo(_nameList);
 
     //carregar o tema que o usuário escolheu
 
@@ -153,8 +162,9 @@ class _HomePageState extends State<HomePage> {
                showDialog(context: context, builder: (context){
 
                 return AlertDialog(
-                  title: Text("Dê um nome para sua lista de tarefas"),
+                  title: Text( _nameList == null? "Dê um nome para sua lista de tarefas": "Criar nova lista de tarefas"),
                   content: TextField(
+                    controller: _controllerSalveList,
                     decoration: InputDecoration(
                       border:OutlineInputBorder(),
                       label: Text("nome"),
@@ -173,6 +183,29 @@ class _HomePageState extends State<HomePage> {
                       //Botão de ok
                     TextButton(
                       onPressed: (){
+                        setState(() {
+                          if(_nameList == null) {
+
+                            List<TaskModel> taf = tarefas;
+
+                          taskrepo.deletarTarefa();
+                            _nameList = _controllerSalveList.text;
+                          taskrepo = TaskRepo(_nameList);
+                          taskrepo.saveTaskList(taf);
+
+
+                          } else {
+                            _nameList = _controllerSalveList.text;
+                            tarefas.clear();
+                            taskrepo = TaskRepo(_nameList);
+                          }
+                          taskrepo.getTaskList().then((value){
+                            tarefas =value;
+                          });
+
+
+                          _controllerSalveList.text = "";
+                        });
                        Navigator.of(context).pop();
                       }, 
                       child: Text("Salvar")),

@@ -7,11 +7,15 @@ import 'package:tarefas/task_model.dart';
 
 class TaskRepo{
 
+String? arqList;
+
+  TaskRepo(String? a) {
+    this.arqList = a;
+  }
 
 
-  TaskRepo() {}
 
-  late SharedPreferences sharedPreferences;
+ // late SharedPreferences sharedPreferences;
 
   Future<List<TaskModel>> getTaskList() async{
     //sharedPreferences = await SharedPreferences.getInstance();
@@ -33,7 +37,7 @@ class TaskRepo{
       customDB.create(recursive: true);
     }
 
-    return File("${customDB.path}/first.json");
+    return File("${customDB.path}/${arqList ?? "nulo"}.json");
 
   }
 
@@ -56,6 +60,21 @@ class TaskRepo{
     }
     catch(e) {
       return "[]";
+    }
+  }
+
+  Future<void> deletarTarefa() async{
+    final directory = await _getFile();
+    final path = "${directory.path}/taskDir/$arqList";
+
+    File file = File(path);
+
+    if(await file.exists()) {
+     file.delete();
+     return;
+    }
+    else {
+      return;
     }
   }
 
