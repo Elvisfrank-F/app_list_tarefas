@@ -64,14 +64,14 @@ class _HomePageState extends State<HomePage> {
 
   //carregar tema
 
-  void carregarTema() async {
+  Future<void> carregarTema() async {
     final isDark = await Settings.getDarkMode();
     themeNotifier.value = isDark? ThemeMode.dark : ThemeMode.light;
   }
 
   //alterar o tema
 
-  void alterarTema() async {
+  Future<void> alterarTema() async {
     final isDark = await Settings.getDarkMode();
     themeNotifier.value = isDark ? ThemeMode.light : ThemeMode.dark;
     await Settings.setDarkMode(!isDark);
@@ -85,7 +85,11 @@ class _HomePageState extends State<HomePage> {
 
     //carregar o tema que o usuário escolheu
 
-    carregarTema();
+     setState(() {
+       carregarTema().then((value){
+         print("tema carregado");
+       });
+     });
 
     //carregar as tarefas antigas
 
@@ -289,7 +293,7 @@ class _HomePageState extends State<HomePage> {
                   
                            ElevatedButton(
                     onPressed:(){
-                      TaskModel novaTask = TaskModel(text: _controller.text, isDark: isDart());
+                      TaskModel novaTask = TaskModel(text: _controller.text, isDark: !isDart());
                       print("tema: ${novaTask.isDark}");
                       setState(() {
                         if(_controller.text == "") {
