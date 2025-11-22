@@ -1,11 +1,8 @@
-import 'dart:math';
 
 import 'package:flutter/material.dart';
 import 'package:tarefas/repositories/task_repo.dart';
 import 'package:tarefas/task_model.dart';
 import 'task.dart';
-
-import 'package:flutter/material.dart';
 
 import 'package:tarefas/repositories/settings.dart';
 

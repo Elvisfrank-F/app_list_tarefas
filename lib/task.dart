@@ -158,7 +158,7 @@ class _TaskState extends State<Task> {
                        title: Text(widget.model.text ?? "null",
                        style: TextStyle(fontSize:19, 
                        fontWeight: FontWeight.bold,
-                       color: widget.model.concluida == false? (widget.model.isDark?Colors.white:Colors.black): Colors.green
+                       color: widget.model.concluida == false? (!widget.model.isDark?Colors.white:Colors.black): Colors.green
                        )),
     
                        subtitle: Column(
@@ -166,7 +166,7 @@ class _TaskState extends State<Task> {
                          children: [
                            Text("" + Date,
                      style: TextStyle(
-                      color: widget.model.concluida ==false? (widget.model.isDark?Colors.white: Colors.black) : Colors.green
+                      color: widget.model.concluida ==false? (!widget.model.isDark?Colors.white: Colors.black) : Colors.green
                      )),
                      SizedBox(height: 2,),
                            Text(widget.model.concluida==false? "STATUS: PENDENTE":"STATUS: CONCLUIDA",
