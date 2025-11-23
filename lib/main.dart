@@ -255,62 +255,77 @@ class _HomePageState extends State<HomePage> {
                   );
                 });
 
-              }, icon: Icon(Icons.upload)),
+              }, icon: Icon(Icons.download)),
 
               GestureDetector(
                 onTap:(){
                showDialog(context: context, builder: (context){
 
-                return AlertDialog(
-                  title: Text( _nameList == null? "Dê um nome para sua lista de tarefas": "Criar nova lista de tarefas"),
-                  content: TextField(
-                    controller: _controllerSalveList,
-                    decoration: InputDecoration(
-                      border:OutlineInputBorder(),
-                      label: Text("nome"),
-                    ),
-                  ),
-                  actions: [
+                return StatefulBuilder(
 
-                    //botão de cancelar
+                   builder :  (context, setStateDialog) {
+                     return AlertDialog(
+                       title: Text(_nameList == null
+                           ? "Dê um nome para sua lista de tarefas"
+                           : "Criar nova lista de tarefas"),
+                       content: TextField(
+                         controller: _controllerSalveList,
+                         decoration: InputDecoration(
+                           border: OutlineInputBorder(),
+                           label: Text("nome"),
+                         ),
+                       ),
+                       actions: [
 
-                    TextButton(
-                      onPressed: (){
-                       Navigator.of(context).pop();
-                      }, 
-                      child: Text("Cancelar")),
+                         //botão de cancelar
 
-                      //Botão de ok
-                    TextButton(
-                      onPressed: (){
-                        setState(() {
-                          if(_nameList == null) {
+                         TextButton(
+                             onPressed: () {
+                               Navigator.of(context).pop();
+                             },
+                             child: Text("Cancelar")),
 
-                            List<TaskModel> taf = tarefas;
-
-
-                            _nameList = _controllerSalveList.text;
-                          taskrepo = TaskRepo(_nameList);
-                          taskrepo.saveTaskList(taf);
-
-
-                          } else {
-                            _nameList = _controllerSalveList.text;
-                            tarefas.clear();
-                            taskrepo = TaskRepo(_nameList);
-                          }
-                          taskrepo.getTaskList().then((value){
-                            tarefas =value;
-                          });
+                         //Botão de ok
+                         TextButton(
+                             onPressed: () {
+                               setStateDialog(()  async{
+                                 if (_nameList == null) {
+                                   List<TaskModel> taf = tarefas;
 
 
-                          _controllerSalveList.text = "";
-                        });
-                       Navigator.of(context).pop();
-                      }, 
-                      child: Text("Salvar")),
-                  ],
-                  
+                                   _nameList = _controllerSalveList.text;
+                                   taskrepo = TaskRepo(_nameList);
+                                   taskrepo.saveTaskList(taf);
+                                 } else {
+                                   _nameList = _controllerSalveList.text;
+                                   tarefas.clear();
+
+                                   if(await TaskRepo.createList(_nameList!)){
+                                     taskrepo = TaskRepo(_nameList);
+                                     Navigator.pop(context);
+                                   }
+                                 }
+                                 taskrepo.getTaskList().then((value) {
+                                   setStateDialog((){
+                                     tarefas = value;
+                                   });
+
+                                 });
+
+                                 TaskRepo.getList().then((value) {
+                                   _ListNameList = value;
+                                 });
+
+
+                                 _controllerSalveList.text = "";
+                               });
+                               Navigator.of(context).pop();
+                             },
+                             child: Text("Salvar")),
+                       ],
+
+                     );
+                   }
                 );
 
                });

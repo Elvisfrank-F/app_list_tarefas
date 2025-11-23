@@ -99,6 +99,22 @@ String? arqList;
     }
   }
 
+  static Future<bool> createList(String list) async{
+    final documents = await getApplicationDocumentsDirectory();
+    final file = File("${documents.path}/taskDir/${list}.json");
+
+    if(!await file.exists()){
+      await file.create(recursive: true);
+      await file.writeAsString("[]");
+      return true;
+
+    }
+    else {
+    return false;
+    }
+
+  }
+
   // Future<void> _loadData() async{
   //
   //   String data = await _readData();
