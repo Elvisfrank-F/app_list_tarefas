@@ -41,6 +41,27 @@ String? arqList;
 
   }
 
+  static Future<List<String>> getList() async {
+    final directory = await getApplicationDocumentsDirectory();
+    final customDB = Directory("${directory.path}/taskDir");
+
+     int cont =0;
+
+     List<String> ListItens=[];
+
+    if(await customDB.exists()){
+      await for(var entity in customDB.list()){
+       if(entity is File) {
+         ListItens.add(entity.path.split("/").last.split('.').first);
+       }
+      }
+      return ListItens;
+    }
+    else {
+      return [];
+    }
+  }
+
   Future<File> _saveData(List<TaskModel> save) async {
      String data = json.encode(save);
     final file = await _getFile();
@@ -63,9 +84,9 @@ String? arqList;
     }
   }
 
-  Future<void> deletarTarefa() async{
-    final directory = await _getFile();
-    final path = "${directory.path}/taskDir/$arqList";
+ static Future<void> deletarTarefa(String arquivo) async{
+    final directory = await getApplicationDocumentsDirectory();
+    final path = "${directory.path}/taskDir/${arquivo}.json";
 
     File file = File(path);
 

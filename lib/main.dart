@@ -3,6 +3,7 @@ import 'package:flutter/material.dart';
 import 'package:tarefas/repositories/task_repo.dart';
 import 'package:tarefas/task_model.dart';
 import 'task.dart';
+import 'package:tarefas/wids/ListTaskWidget.dart';
 
 import 'package:tarefas/repositories/settings.dart';
 
@@ -53,6 +54,7 @@ class _HomePageState extends State<HomePage> {
   //string para dizer o nome da lista
 
   String? _nameList;
+  List<String?> _ListNameList = [];
   
 
   //função que retorna a quantidade de atividades pendentes
@@ -87,18 +89,31 @@ class _HomePageState extends State<HomePage> {
 
 
 
+
+
   @override
   void initState(){
     super.initState();
-    taskrepo = TaskRepo(_nameList);
+    TaskRepo.getList().then(
+        (value){
+          _ListNameList = value;
+          if(_ListNameList.isNotEmpty){
+            _nameList = _ListNameList.first;
+
+          }
+          else {
+            _nameList = null;
+          }
+
+          taskrepo = TaskRepo(_nameList ?? "nulo");
+        }
+    );
+
 
     //carregar o tema que o usuário escolheu
 
-     setState(() {
-       carregarTema().then((value){
-         print("tema carregado");
-       });
-     });
+
+       carregarTema();
 
     //carregar as tarefas antigas
 
@@ -119,7 +134,7 @@ class _HomePageState extends State<HomePage> {
       }
     );
 
-    if(tarefas.isNotEmpty) print("verificando se é true ${tarefas[0].isDark}");
+    if(tarefas.isNotEmpty) print("verificando se é true: ${tarefas[0].isDark}");
     if(tarefas.isEmpty) print("ta vazio");
 
 
@@ -151,12 +166,97 @@ class _HomePageState extends State<HomePage> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      appBar:AppBar(title: Row(
+      appBar:AppBar(
+          title: Text("$_nameList"),
+          centerTitle: true,
+          actions: [ Row(
         mainAxisAlignment: MainAxisAlignment.spaceBetween,
         children: [
           Text(""),
           Row(
             children: [
+
+              IconButton(onPressed: (){
+
+               TaskRepo.getList().then((value){
+                 _ListNameList = value;
+               });
+
+                showDialog(context: context, builder: (context){
+
+                  return StatefulBuilder(
+                    builder: (context, setStateDialog){
+
+
+                    return  AlertDialog(
+                      title: Text("Lista de tarefas: "),
+                      content: Container(
+                        width: 400,
+                        height: 600,
+                        child: ListView.builder(
+                          shrinkWrap: true,
+                          itemCount: _ListNameList.length,
+                          itemBuilder: (context, index){
+                          return GestureDetector(
+
+                            onTap: (){
+                              setState(() {
+                                _nameList = _ListNameList[index];
+                                taskrepo = TaskRepo(_nameList);
+                              });
+                                taskrepo.getTaskList().then((value){
+                                  setState(() {
+                                    tarefas = value;
+                                  });
+
+                                });
+                                Navigator.pop(context);
+
+
+                            },
+
+                            child: ListTaskWidget(text: _ListNameList[index]! , onDelete: (){
+
+
+                                TaskRepo.deletarTarefa(_ListNameList[index]!).then((value){
+                                  setStateDialog((){
+                                  _ListNameList.removeAt(index);
+                                });
+
+
+                              });
+
+                              setState(() {
+
+                              });
+
+
+
+                            }),
+                          );
+                          },
+                        ),
+                      ),
+                      actions: [
+                        TextButton(onPressed: ()
+                    {
+                      Navigator.pop(context);
+                    },
+                    child: Text("Cancelar")),
+
+                        TextButton(onPressed: ()
+                        {
+                          Navigator.pop(context);
+                        },
+                            child: Text("Ok"))
+                      ],
+                    );
+                    }
+                  );
+                });
+
+              }, icon: Icon(Icons.upload)),
+
               GestureDetector(
                 onTap:(){
                showDialog(context: context, builder: (context){
@@ -188,7 +288,7 @@ class _HomePageState extends State<HomePage> {
 
                             List<TaskModel> taf = tarefas;
 
-                          taskrepo.deletarTarefa();
+
                             _nameList = _controllerSalveList.text;
                           taskrepo = TaskRepo(_nameList);
                           taskrepo.saveTaskList(taf);
@@ -223,7 +323,9 @@ class _HomePageState extends State<HomePage> {
           ),
           
         ],
-      )),
+      )]
+
+      ),
       onDrawerChanged: (context){
         _focusNode.unfocus();
       },
