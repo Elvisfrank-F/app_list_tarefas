@@ -485,10 +485,7 @@ class _HomePageState extends State<HomePage> {
                                      tarefas.clear();
                                    });
 
-                                   TaskRepo.setLastList(_controllerSalveList.text).then((value){
-
-
-                                   });
+                                   await TaskRepo.setLastList(_controllerSalveList.text);
 
 
 
@@ -497,19 +494,19 @@ class _HomePageState extends State<HomePage> {
 
                                    }
                                  }
-                                 taskrepo.getTaskList().then((value) {
-                                   setStateDialog((){
-                                     tarefas = value;
-                                   });
+                                 final value = await taskrepo.getTaskList();
 
+                                 setState(() {
+                                   tarefas = value;
                                  });
 
-                                 TaskRepo.getList().then((value) {
+                                 final listK = await TaskRepo.getList();
+
                                    setState(() {
-                                     _ListNameList = value;
+                                     _ListNameList = listK;
                                    });
 
-                                 });
+
 
 
                                  _controllerSalveList.text = "";
