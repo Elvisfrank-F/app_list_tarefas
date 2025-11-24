@@ -167,7 +167,9 @@ class _HomePageState extends State<HomePage> {
   Widget build(BuildContext context) {
     return Scaffold(
       appBar:AppBar(
-          title: Text("$_nameList"),
+          title: FittedBox(
+            fit: BoxFit.scaleDown,
+              child: Text("$_nameList")),
           centerTitle: true,
           actions: [ Row(
         mainAxisAlignment: MainAxisAlignment.spaceBetween,
@@ -288,6 +290,7 @@ class _HomePageState extends State<HomePage> {
                          //Botão de ok
                          TextButton(
                              onPressed: () {
+                               Navigator.pop(context);
                                setStateDialog(()  async{
                                  if (_nameList == null) {
                                    List<TaskModel> taf = tarefas;
@@ -297,12 +300,15 @@ class _HomePageState extends State<HomePage> {
                                    taskrepo = TaskRepo(_nameList);
                                    taskrepo.saveTaskList(taf);
                                  } else {
-                                   _nameList = _controllerSalveList.text;
-                                   tarefas.clear();
+                                   setState(() {
+                                     _nameList = _controllerSalveList.text;
+                                     tarefas.clear();
+                                   });
+
 
                                    if(await TaskRepo.createList(_nameList!)){
                                      taskrepo = TaskRepo(_nameList);
-                                     Navigator.pop(context);
+
                                    }
                                  }
                                  taskrepo.getTaskList().then((value) {
@@ -313,13 +319,16 @@ class _HomePageState extends State<HomePage> {
                                  });
 
                                  TaskRepo.getList().then((value) {
-                                   _ListNameList = value;
+                                   setState(() {
+                                     _ListNameList = value;
+                                   });
+
                                  });
 
 
                                  _controllerSalveList.text = "";
                                });
-                               Navigator.of(context).pop();
+                              // Navigator.of(context).pop();
                              },
                              child: Text("Salvar")),
                        ],
