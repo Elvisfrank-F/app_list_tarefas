@@ -54,8 +54,7 @@ static final String arqLastList = "lastList";
       await for(var entity in customDB.list()){
        if(entity is File) {
          ListItens.add(entity.path.split("/").last.split('.').first);
-       }
-      }
+       }}
       return ListItens;
     }
     else {
