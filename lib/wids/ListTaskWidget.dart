@@ -4,8 +4,9 @@ class ListTaskWidget extends StatefulWidget {
 
   final String text;
   final VoidCallback onDelete;
+  final VoidCallback onEdit;
 
-  const ListTaskWidget({super.key, required this.text, required this.onDelete});
+  const ListTaskWidget({super.key, required this.text, required this.onDelete, required this.onEdit});
 
 
 
@@ -20,6 +21,7 @@ class _ListTaskWidgetState extends State<ListTaskWidget> {
       child: Row(
         mainAxisAlignment: MainAxisAlignment.spaceBetween,
         children: [
+          IconButton(onPressed: widget.onEdit, icon: Icon(Icons.edit)),
           Text("${widget.text}"),
           IconButton(onPressed: widget.onDelete, icon: Icon(Icons.delete))
         ],

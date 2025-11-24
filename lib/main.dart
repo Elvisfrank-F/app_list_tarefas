@@ -40,6 +40,8 @@ class HomePage extends StatefulWidget {
 
 class _HomePageState extends State<HomePage> {
 
+  //começo
+
   List<TaskModel>tarefas = [];
   List<Text>vazio = [Text("")];
   TextEditingController _controller = TextEditingController();
@@ -72,6 +74,10 @@ class _HomePageState extends State<HomePage> {
 
    TaskRepo taskrepo = TaskRepo("nulo");
 
+   //controller do texfield do editor de lista de lista de tarefas
+
+  TextEditingController _controllerEditListTask = TextEditingController();
+
   //carregar tema
 
   Future<void> carregarTema() async {
@@ -94,18 +100,64 @@ class _HomePageState extends State<HomePage> {
   @override
   void initState(){
     super.initState();
+    carregarTema();
     TaskRepo.getList().then(
         (value){
           _ListNameList = value;
           if(_ListNameList.isNotEmpty){
-            _nameList = _ListNameList.first;
+            TaskRepo.getLastList().then((value){
+              setState(() {
+                _nameList = value;
+                taskrepo = TaskRepo(_nameList ?? "nulo");
+              });
+
+              taskrepo.getTaskList().then(
+                      (value){
+                    setState(() {
+                      tarefas = value;
+
+                      // if(tarefas.length>0){
+                      //   if(tarefas[0].isDark){
+                      //     themeNotifier.value = ThemeMode.dark;
+                      //   }
+                      // }
+
+
+                    });
+
+                  }
+              );
+
+            });
 
           }
           else {
-            _nameList = null;
+            TaskRepo.getLastList().then((value){
+              setState(() {
+                _nameList = value;
+                taskrepo = TaskRepo(_nameList ?? "nulo");
+
+                taskrepo.getTaskList().then(
+                        (value){
+                      setState(() {
+                        tarefas = value;
+
+                        // if(tarefas.length>0){
+                        //   if(tarefas[0].isDark){
+                        //     themeNotifier.value = ThemeMode.dark;
+                        //   }
+                        // }
+
+
+                      });
+
+                    }
+                );
+              });
+            });
           }
 
-          taskrepo = TaskRepo(_nameList ?? "nulo");
+
         }
     );
 
@@ -113,26 +165,11 @@ class _HomePageState extends State<HomePage> {
     //carregar o tema que o usuário escolheu
 
 
-       carregarTema();
+
 
     //carregar as tarefas antigas
 
-    taskrepo.getTaskList().then(
-      (value){
-        setState(() {
-          tarefas = value;
-          
-          // if(tarefas.length>0){
-          //   if(tarefas[0].isDark){
-          //     themeNotifier.value = ThemeMode.dark;
-          //   }
-          // }
 
-
-        });
-        
-      }
-    );
 
     if(tarefas.isNotEmpty) print("verificando se é true: ${tarefas[0].isDark}");
     if(tarefas.isEmpty) print("ta vazio");
@@ -178,7 +215,9 @@ class _HomePageState extends State<HomePage> {
           Row(
             children: [
 
-              IconButton(onPressed: (){
+              IconButton(
+
+                  onPressed: (){
 
                TaskRepo.getList().then((value){
                  _ListNameList = value;
@@ -193,8 +232,8 @@ class _HomePageState extends State<HomePage> {
                     return  AlertDialog(
                       title: Text("Lista de tarefas: "),
                       content: Container(
-                        width: 400,
-                        height: 600,
+                        width: MediaQuery.of(context).size.width*0.7,
+                        height: MediaQuery.of(context).size.width*0.5,
                         child: ListView.builder(
                           shrinkWrap: true,
                           itemCount: _ListNameList.length,
@@ -202,9 +241,20 @@ class _HomePageState extends State<HomePage> {
                           return GestureDetector(
 
                             onTap: (){
+
                               setState(() {
                                 _nameList = _ListNameList[index];
                                 taskrepo = TaskRepo(_nameList);
+                              });
+
+                              TaskRepo.setLastList(_ListNameList[index]!).then((value){
+
+
+
+                              });
+
+                              setState(() {
+
                               });
                                 taskrepo.getTaskList().then((value){
                                   setState(() {
@@ -219,14 +269,40 @@ class _HomePageState extends State<HomePage> {
 
                             child: ListTaskWidget(text: _ListNameList[index]! , onDelete: (){
 
+                              showDialog(context: context, builder: (context){
 
-                                TaskRepo.deletarTarefa(_ListNameList[index]!).then((value){
-                                  setStateDialog((){
-                                  _ListNameList.removeAt(index);
+                                return AlertDialog(
+                                  content: Container(
+                                    // height: 100,
+                                    //   width: 100,
+                                    child: Text("Deseja realmente excluir a lista de tarefas: \" ${_ListNameList[index]}\" ? ",
+                                    style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold)),
+                                  ),
+                                  actions: [
+                                    TextButton(onPressed: (){
+                                      Navigator.pop(context);
+                                    }, child: Text("cancelar", style: TextStyle(color:Colors.green))),
+                                    TextButton(onPressed: (){
+
+                                      Navigator.pop(context);
+
+                                      TaskRepo.deletarTarefa(_ListNameList[index]!).then((value){
+                                setStateDialog((){
+                                _ListNameList.removeAt(index);
                                 });
 
 
+                                    });
+                                    }
+                                    , child: Text("sim", style: TextStyle(color: Colors.red),))
+                                  ],
+                                );
+
                               });
+
+
+
+
 
                               setState(() {
 
@@ -234,7 +310,58 @@ class _HomePageState extends State<HomePage> {
 
 
 
-                            }),
+                            },
+                            onEdit: (){
+                              showDialog(context: context, builder: (context){
+                                return AlertDialog(
+
+                                  content: Container(
+                                    width: 400,
+                                      height: 100,
+                                    child: Column(
+                                      mainAxisAlignment: MainAxisAlignment.center,
+                                      crossAxisAlignment: CrossAxisAlignment.center,
+                                      children: [
+                                        Text("Mudar o nome da tarefa",
+                                        style: TextStyle(fontSize: 17, fontWeight: FontWeight.w300)),
+                                        TextField(
+                                          controller: _controllerEditListTask,
+                                          decoration: InputDecoration(
+                                            border: OutlineInputBorder(
+                                              borderRadius: BorderRadius.circular(10)
+                                            )
+                                          ),
+                                        ),
+                                      ],
+                                    ),
+                                  ),
+
+                                  actions: [
+                                    TextButton(onPressed: (){
+                                      Navigator.pop(context);
+                                    }, child: Text("Cancelar")),
+
+                                    TextButton(onPressed: (){
+                                      Navigator.pop(context);
+                                      setStateDialog(() {
+                                        TaskRepo.renameList(_ListNameList[index]!, _controllerEditListTask.text);
+                                        _ListNameList[index] = _controllerEditListTask.text;
+                                        _controllerEditListTask.text = "";
+                                      });
+                                      setState(() {
+                                        _nameList = _ListNameList[index];
+                                      });
+                                      TaskRepo.setLastList(_ListNameList[index]!).then((value){
+
+                                      });
+
+                                    }, child: Text("Salvar"))
+                                  ],
+
+                                );
+                              });
+                            },
+                            ),
                           );
                           },
                         ),
@@ -295,15 +422,27 @@ class _HomePageState extends State<HomePage> {
                                  if (_nameList == null) {
                                    List<TaskModel> taf = tarefas;
 
-
                                    _nameList = _controllerSalveList.text;
                                    taskrepo = TaskRepo(_nameList);
                                    taskrepo.saveTaskList(taf);
+                                   TaskRepo.setLastList(_controllerSalveList.text).then((value){
+
+                                   });
+
+
                                  } else {
+
+
                                    setState(() {
                                      _nameList = _controllerSalveList.text;
                                      tarefas.clear();
                                    });
+
+                                   TaskRepo.setLastList(_controllerSalveList.text).then((value){
+
+
+                                   });
+
 
 
                                    if(await TaskRepo.createList(_nameList!)){

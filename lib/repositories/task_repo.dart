@@ -8,6 +8,7 @@ import 'package:tarefas/task_model.dart';
 class TaskRepo{
 
 String? arqList;
+static final String arqLastList = "lastList";
 
   TaskRepo(String? a) {
     this.arqList = a;
@@ -115,12 +116,31 @@ String? arqList;
 
   }
 
+  static Future<void> renameList(String OldName, String NewName) async {
+    final directory = await getApplicationDocumentsDirectory();
+    File fila = File("${directory.path}/taskDir/$OldName.json");
+
+    if(await fila.exists()){
+      fila.rename("${directory.path}/taskDir/$NewName.json");
+    }
+  }
+
   // Future<void> _loadData() async{
   //
   //   String data = await _readData();
   //
   //
   // }
+
+static Future<void> setLastList(String lastList) async{
+    final shared = await SharedPreferences.getInstance();
+    shared.setString(arqLastList, lastList);
+}
+
+static Future<String> getLastList() async{
+    final shared = await SharedPreferences.getInstance();
+    return  shared.getString(arqLastList) ?? "sem arquivo";
+}
 
 
 
