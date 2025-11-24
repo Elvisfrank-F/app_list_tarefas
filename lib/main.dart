@@ -289,6 +289,15 @@ class _HomePageState extends State<HomePage> {
                                       TaskRepo.deletarTarefa(_ListNameList[index]!).then((value){
                                 setStateDialog((){
                                 _ListNameList.removeAt(index);
+                                 setState(() {
+                                   if(_ListNameList.isNotEmpty) {
+                                     _nameList = _ListNameList[0];
+                                   }
+                                   else {
+                                     _nameList = "crie uma nova tarefa";
+                                     taskrepo = TaskRepo(_nameList);
+                                   }
+                                 });
                                 });
 
 
