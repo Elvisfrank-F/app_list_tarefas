@@ -292,10 +292,21 @@ class _HomePageState extends State<HomePage> {
                                  setState(() {
                                    if(_ListNameList.isNotEmpty) {
                                      _nameList = _ListNameList[0];
+                                     tarefas.clear();
+                                    taskrepo = TaskRepo(_nameList);
+                                    taskrepo.getTaskList().then((value){
+                                      setState(() {
+                                        tarefas = value;
+                                      });
+
+                                    });
+
                                    }
                                    else {
-                                     _nameList = "crie uma nova tarefa";
+                                     _nameList = "first_task";
+                                     tarefas.clear();
                                      taskrepo = TaskRepo(_nameList);
+
                                    }
                                  });
                                 });
@@ -350,17 +361,38 @@ class _HomePageState extends State<HomePage> {
                                       Navigator.pop(context);
                                     }, child: Text("Cancelar")),
 
-                                    TextButton(onPressed: (){
+                                    TextButton(onPressed: () async {
+
                                       Navigator.pop(context);
-                                      setStateDialog(() {
-                                        TaskRepo.renameList(_ListNameList[index]!, _controllerEditListTask.text);
-                                        _ListNameList[index] = _controllerEditListTask.text;
-                                        _controllerEditListTask.text = "";
+
+                                        await TaskRepo.renameList(_ListNameList[index]!, _controllerEditListTask.text);
+
+                                        setState(() {
+                                          _nameList = _controllerEditListTask.text;
+
+                                          _ListNameList[index] = _controllerEditListTask.text;
+                                          _controllerEditListTask.text = "";
+                                        });
+
+
+
+                                      await TaskRepo.setLastList(_ListNameList[index]!);
+
+                                      taskrepo = TaskRepo(_nameList);
+
+                                      final lista = await taskrepo.getTaskList();
+
+
+
+                                      setStateDialog((){
+
+                                        tarefas = lista;
+                                     //   _ListNameList = await taskrepo
+
                                       });
+
+                                      _controllerEditListTask.clear();
                                       setState(() {
-                                        _nameList = _ListNameList[index];
-                                      });
-                                      TaskRepo.setLastList(_ListNameList[index]!).then((value){
 
                                       });
 
@@ -378,12 +410,18 @@ class _HomePageState extends State<HomePage> {
                       actions: [
                         TextButton(onPressed: ()
                     {
+                      setState(() {
+
+                      });
                       Navigator.pop(context);
                     },
                     child: Text("Cancelar")),
 
                         TextButton(onPressed: ()
                         {
+                          setState(() {
+
+                          });
                           Navigator.pop(context);
                         },
                             child: Text("Ok"))
