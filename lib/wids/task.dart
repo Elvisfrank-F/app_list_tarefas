@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:intl/intl.dart';
 import 'package:flutter_slidable/flutter_slidable.dart';
-import 'package:tarefas/task_model.dart';
+import 'package:tarefas/models/task_model.dart';
 
 
 class Task extends StatefulWidget {

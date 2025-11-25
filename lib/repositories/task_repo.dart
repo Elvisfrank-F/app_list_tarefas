@@ -3,7 +3,7 @@ import 'dart:io';
 import 'dart:async';
 import 'package:path_provider/path_provider.dart';
 import 'package:shared_preferences/shared_preferences.dart';
-import 'package:tarefas/task_model.dart';
+import 'package:tarefas/models/task_model.dart';
 
 class TaskRepo{
 
