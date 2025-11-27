@@ -6,6 +6,8 @@ import 'package:tarefas/wids/task.dart';
 import 'package:tarefas/wids/ListTaskWidget.dart';
 
 import 'package:tarefas/repositories/settings.dart';
+import 'package:tarefas/controllers/task_controller.dart';
+
 
 
 class HomePage extends StatefulWidget {
@@ -20,79 +22,27 @@ class _HomePageState extends State<HomePage> {
 
   //começo
 
-  List<TaskModel>tarefas = [];
-  List<Text>vazio = [Text("")];
-  TextEditingController _controller = TextEditingController();
-  int get qtdTask => tarefas.length;
-
-  final FocusNode _focusNode = FocusNode();
-
-  //controller para salvar a list
-
-  TextEditingController _controllerSalveList = TextEditingController();
-
-  //string para dizer o nome da lista
-
-  String? _nameList;
-  List<String?> _ListNameList = [];
-
-
-  //função que retorna a quantidade de atividades pendentes
-  int get qtsPendencia => tarefas.where((tarefa) => !tarefa.concluida).length;
-
-  //variáveis usadas para desfazer a delete
-  late TaskModel LastDelete;
-  int LastDeletePos = 0;
-
-  //lista usada para esfazer o limpar tudo
-
-  List<TaskModel> LastTask = [];
-
-  //instanciando o repositório para armazenagem e reciclagem de dados
-
-  TaskRepo taskrepo = TaskRepo("nulo");
-
-  //controller do texfield do editor de lista de lista de tarefas
-
-  TextEditingController _controllerEditListTask = TextEditingController();
-
-  //carregar tema
-
-  Future<void> carregarTema() async {
-    final isDark = await Settings.getDarkMode();
-    themeNotifier.value = isDark? ThemeMode.dark : ThemeMode.light;
-  }
-
-  //alterar o tema
-
-  Future<void> alterarTema() async {
-    final isDark = await Settings.getDarkMode();
-    themeNotifier.value = isDark ? ThemeMode.light : ThemeMode.dark;
-    await Settings.setDarkMode(!isDark);
-  }
-
-
-
+  TaskController c = TaskController();
 
 
   @override
   void initState(){
     super.initState();
-    carregarTema();
+    c.carregarTema();
     TaskRepo.getList().then(
             (value){
-          _ListNameList = value;
-          if(_ListNameList.isNotEmpty){
+          c.ListNameList = value;
+          if(c.ListNameList.isNotEmpty){
             TaskRepo.getLastList().then((value){
               setState(() {
-                _nameList = value;
-                taskrepo = TaskRepo(_nameList ?? "nulo");
+                c.nameList = value;
+                c.taskrepo = TaskRepo(c.nameList ?? "nulo");
               });
 
-              taskrepo.getTaskList().then(
+              c.taskrepo.getTaskList().then(
                       (value){
                     setState(() {
-                      tarefas = value;
+                      c.tarefas = value;
 
                       // if(tarefas.length>0){
                       //   if(tarefas[0].isDark){
@@ -112,13 +62,13 @@ class _HomePageState extends State<HomePage> {
           else {
             TaskRepo.getLastList().then((value){
               setState(() {
-                _nameList = value;
-                taskrepo = TaskRepo(_nameList ?? "nulo");
+                c.nameList = value;
+                c.taskrepo = TaskRepo(c.nameList ?? "nulo");
 
-                taskrepo.getTaskList().then(
+                c.taskrepo.getTaskList().then(
                         (value){
                       setState(() {
-                        tarefas = value;
+                        c.tarefas = value;
 
                         // if(tarefas.length>0){
                         //   if(tarefas[0].isDark){
@@ -149,31 +99,15 @@ class _HomePageState extends State<HomePage> {
 
 
 
-    if(tarefas.isNotEmpty) print("verificando se é true: ${tarefas[0].isDark}");
-    if(tarefas.isEmpty) print("ta vazio");
+    if(c.tarefas.isNotEmpty) print("verificando se é true: ${c.tarefas[0].isDark}");
+    if(c.tarefas.isEmpty) print("ta vazio");
 
 
   }
 
 
 
-  bool limpar(){
-    if(tarefas.length-qtsPendencia>0) {
-      return true;
-    }
-    else {
-      return false;
-    }
 
-  }
-
-  bool isDart(){
-
-    if(tarefas.isNotEmpty) print("verificando se é true ${tarefas[0].isDark}");
-
-    return themeNotifier.value == ThemeMode.dark;
-
-  }
 
 
 
@@ -184,7 +118,7 @@ class _HomePageState extends State<HomePage> {
       appBar:AppBar(
           title: FittedBox(
               fit: BoxFit.scaleDown,
-              child: Text("$_nameList")),
+              child: Text("$c.nameList")),
           centerTitle: true,
           actions: [ Row(
             mainAxisAlignment: MainAxisAlignment.spaceBetween,
@@ -198,7 +132,7 @@ class _HomePageState extends State<HomePage> {
                       onPressed: (){
 
                         TaskRepo.getList().then((value){
-                          _ListNameList = value;
+                          c.ListNameList = value;
                         });
 
                         showDialog(context: context, builder: (context){
@@ -214,18 +148,18 @@ class _HomePageState extends State<HomePage> {
                                     height: MediaQuery.of(context).size.width*0.5,
                                     child: ListView.builder(
                                       shrinkWrap: true,
-                                      itemCount: _ListNameList.length,
+                                      itemCount: c.ListNameList.length,
                                       itemBuilder: (context, index){
                                         return GestureDetector(
 
                                           onTap: (){
 
                                             setState(() {
-                                              _nameList = _ListNameList[index];
-                                              taskrepo = TaskRepo(_nameList);
+                                              c.nameList = c.ListNameList[index];
+                                              c.taskrepo = TaskRepo(c.nameList);
                                             });
 
-                                            TaskRepo.setLastList(_ListNameList[index]!).then((value){
+                                            TaskRepo.setLastList(c.ListNameList[index]!).then((value){
 
 
 
@@ -234,9 +168,9 @@ class _HomePageState extends State<HomePage> {
                                             setState(() {
 
                                             });
-                                            taskrepo.getTaskList().then((value){
+                                            c.taskrepo.getTaskList().then((value){
                                               setState(() {
-                                                tarefas = value;
+                                                c.tarefas = value;
                                               });
 
                                             });
@@ -245,7 +179,7 @@ class _HomePageState extends State<HomePage> {
 
                                           },
 
-                                          child: ListTaskWidget(text: _ListNameList[index]! , onDelete: (){
+                                          child: ListTaskWidget(text: c.ListNameList[index]! , onDelete: (){
 
                                             showDialog(context: context, builder: (context){
 
@@ -253,7 +187,7 @@ class _HomePageState extends State<HomePage> {
                                                 content: Container(
                                                   // height: 100,
                                                   //   width: 100,
-                                                  child: Text("Deseja realmente excluir a lista de tarefas: \" ${_ListNameList[index]}\" ? ",
+                                                  child: Text("Deseja realmente excluir a lista de tarefas: \" ${c.ListNameList[index]}\" ? ",
                                                       style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold)),
                                                 ),
                                                 actions: [
@@ -264,26 +198,26 @@ class _HomePageState extends State<HomePage> {
 
                                                     Navigator.pop(context);
 
-                                                    TaskRepo.deletarTarefa(_ListNameList[index]!).then((value){
+                                                    TaskRepo.deletarTarefa(c.ListNameList[index]!).then((value){
                                                       setStateDialog((){
-                                                        _ListNameList.removeAt(index);
+                                                        c.ListNameList.removeAt(index);
                                                         setState(() {
-                                                          if(_ListNameList.isNotEmpty) {
-                                                            _nameList = _ListNameList[0];
-                                                            tarefas.clear();
-                                                            taskrepo = TaskRepo(_nameList);
-                                                            taskrepo.getTaskList().then((value){
+                                                          if(c.ListNameList.isNotEmpty) {
+                                                            c.nameList = c.ListNameList[0];
+                                                            c.tarefas.clear();
+                                                            c.taskrepo = TaskRepo(c.nameList);
+                                                            c.taskrepo.getTaskList().then((value){
                                                               setState(() {
-                                                                tarefas = value;
+                                                                c.tarefas = value;
                                                               });
 
                                                             });
 
                                                           }
                                                           else {
-                                                            _nameList = "first_task";
-                                                            tarefas.clear();
-                                                            taskrepo = TaskRepo(_nameList);
+                                                            c.nameList = "first_task";
+                                                            c.tarefas.clear();
+                                                            c.taskrepo = TaskRepo(c.nameList);
 
                                                           }
                                                         });
@@ -343,29 +277,29 @@ class _HomePageState extends State<HomePage> {
 
                                                       Navigator.pop(context);
 
-                                                      await TaskRepo.renameList(_ListNameList[index]!, _controllerEditListTask.text);
+                                                      await TaskRepo.renameList(c.ListNameList[index]!, _controllerEditListTask.text);
 
                                                       setState(() {
-                                                        _nameList = _controllerEditListTask.text;
+                                                        c.nameList = _controllerEditListTask.text;
 
-                                                        _ListNameList[index] = _controllerEditListTask.text;
+                                                        c.ListNameList[index] = _controllerEditListTask.text;
                                                         _controllerEditListTask.text = "";
                                                       });
 
 
 
-                                                      await TaskRepo.setLastList(_ListNameList[index]!);
+                                                      await TaskRepo.setLastList(c.ListNameList[index]!);
 
-                                                      taskrepo = TaskRepo(_nameList);
+                                                      c.taskrepo = TaskRepo(c.nameList);
 
-                                                      final lista = await taskrepo.getTaskList();
+                                                      final lista = await c.taskrepo.getTaskList();
 
 
 
                                                       setStateDialog((){
 
-                                                        tarefas = lista;
-                                                        //   _ListNameList = await taskrepo
+                                                        c.tarefas = lista;
+                                                        //   c.ListNameList = await taskrepo
 
                                                       });
 
@@ -419,11 +353,11 @@ class _HomePageState extends State<HomePage> {
 
                               builder :  (context, setStateDialog) {
                                 return AlertDialog(
-                                  title: Text(_nameList == null
+                                  title: Text(c.nameList == null
                                       ? "Dê um nome para sua lista de tarefas"
                                       : "Criar nova lista de tarefas"),
                                   content: TextField(
-                                    controller: _controllerSalveList,
+                                    controller: c.controllerSalveList,
                                     decoration: InputDecoration(
                                       border: OutlineInputBorder(),
                                       label: Text("nome"),
@@ -444,13 +378,13 @@ class _HomePageState extends State<HomePage> {
                                         onPressed: () {
                                           Navigator.pop(context);
                                           setStateDialog(()  async{
-                                            if (_nameList == null) {
-                                              List<TaskModel> taf = tarefas;
+                                            if (c.nameList == null) {
+                                              List<TaskModel> taf = c.tarefas;
 
-                                              _nameList = _controllerSalveList.text;
-                                              taskrepo = TaskRepo(_nameList);
-                                              taskrepo.saveTaskList(taf);
-                                              TaskRepo.setLastList(_controllerSalveList.text).then((value){
+                                              c.nameList = c.controllerSalveList.text;
+                                              c.taskrepo = TaskRepo(c.nameList);
+                                              c.taskrepo.saveTaskList(taf);
+                                              TaskRepo.setLastList(c.controllerSalveList.text).then((value){
 
                                               });
 
@@ -459,35 +393,35 @@ class _HomePageState extends State<HomePage> {
 
 
                                               setState(() {
-                                                _nameList = _controllerSalveList.text;
-                                                tarefas.clear();
+                                                c.nameList = c.controllerSalveList.text;
+                                                c.tarefas.clear();
                                               });
 
-                                              await TaskRepo.setLastList(_controllerSalveList.text);
+                                              await TaskRepo.setLastList(c.controllerSalveList.text);
 
 
 
-                                              if(await TaskRepo.createList(_nameList!)){
-                                                taskrepo = TaskRepo(_nameList);
+                                              if(await TaskRepo.createList(c.nameList!)){
+                                                c.taskrepo = TaskRepo(c.nameList);
 
                                               }
                                             }
-                                            final value = await taskrepo.getTaskList();
+                                            final value = await c.taskrepo.getTaskList();
 
                                             setState(() {
-                                              tarefas = value;
+                                              c.tarefas = value;
                                             });
 
                                             final listK = await TaskRepo.getList();
 
                                             setState(() {
-                                              _ListNameList = listK;
+                                              c.ListNameList = listK;
                                             });
 
 
 
 
-                                            _controllerSalveList.text = "";
+                                            c.controllerSalveList.text = "";
                                           });
                                           // Navigator.of(context).pop();
                                         },
@@ -539,17 +473,17 @@ class _HomePageState extends State<HomePage> {
 
                       Switch(value: themeNotifier.value == ThemeMode.dark,
                           onChanged: (value){
-                            alterarTema();
+                            c.alterarThema();
                             //themeNotifier.value = value ? ThemeMode.dark : ThemeMode.light;
-                            for(int i=0;i<tarefas.length;i++){
+                            for(int i=0;i<c.tarefas.length;i++){
                               if(isDart()){
-                                tarefas[i].isDark = true;
+                                c.tarefas[i].isDark = true;
                               }
                               else {
-                                tarefas[i].isDark = false;
+                                c.tarefas[i].isDark = false;
                               }
                             }
-                            taskrepo.saveTaskList(tarefas);
+                            c.taskrepo.saveTaskList(c.tarefas);
                             _focusNode.unfocus();
 
                           }),
@@ -646,9 +580,9 @@ class _HomePageState extends State<HomePage> {
                                         });
                                   }
                                   else {
-                                    tarefas.add(novaTask);
-                                    taskrepo.saveTaskList(tarefas);
-                                    print(tarefas.length);
+                                    c.tarefas.add(novaTask);
+                                    c.taskrepo.saveTaskList(c.tarefas);
+                                    print(c.tarefas.length);
                                     _controller.clear();
                                     _focusNode.unfocus();
                                   }
@@ -666,18 +600,18 @@ class _HomePageState extends State<HomePage> {
                 ),
                 SizedBox(height: 20,),
                 Expanded(
-                  child: tarefas.isEmpty? Center(child: Text("Nenhuma tarefa"))
+                  child: c.tarefas.isEmpty? Center(child: Text("Nenhuma tarefa"))
                       : ListView.builder(
-                      itemCount: tarefas.length,
+                      itemCount: c.tarefas.length,
                       itemBuilder: (context, index){
                         return Task(
-                          model: tarefas[index],
+                          model: c.tarefas[index],
                           OnDelete: () {
-                            LastDelete = tarefas[index];
+                            LastDelete = c.tarefas[index];
                             LastDeletePos = index;
                             setState(() {
-                              tarefas.removeAt(index);
-                              taskrepo.saveTaskList(tarefas);
+                              c.tarefas.removeAt(index);
+                              c.taskrepo.saveTaskList(c.tarefas);
                             });
 
                             ScaffoldMessenger.of(context).clearSnackBars();
@@ -693,8 +627,8 @@ class _HomePageState extends State<HomePage> {
                                       backgroundColor: Colors.transparent,
                                       onPressed: (){
                                         setState(() {
-                                          tarefas.insert(LastDeletePos, LastDelete);
-                                          taskrepo.saveTaskList(tarefas);
+                                          c.tarefas.insert(LastDeletePos, LastDelete);
+                                          c.taskrepo.saveTaskList(c.tarefas);
                                           // FocusScope.of(context).unfocus();
                                         });
 
@@ -708,11 +642,11 @@ class _HomePageState extends State<HomePage> {
                             );
                           },
                           OnEditing: (){
-                            taskrepo.saveTaskList(tarefas);
+                            c.taskrepo.saveTaskList(c.tarefas);
                           },
                           OnChaged: (){
                             setState(() {
-                              taskrepo.saveTaskList(tarefas);
+                              c.taskrepo.saveTaskList(c.tarefas);
                             });
                           },
 
@@ -737,10 +671,10 @@ class _HomePageState extends State<HomePage> {
                                 title: Row(
                                   children: [
                                     Icon(Icons.warning, color: Colors.amber),
-                                    Text(tarefas.length==0?"Ta frescando é doido":(limpar()?" - Apagar tarefas?":" - Apagar tudo?")),
+                                    Text(c.tarefas.length==0?"Ta frescando é doido":(limpar()?" - Apagar tarefas?":" - Apagar tudo?")),
                                   ],
                                 ),
-                                content: Text(tarefas.length==0?"Tem nada para apagar não abestado" :(limpar()?"Deseja realmente apagar todas as tarefas concluídas? Não será possível a recuperação dos dados após serem excluídos.":"Deseja realmente apagar tudo? Não será possível a recuperação dos dados após o delete.")),
+                                content: Text(c.tarefas.length==0?"Tem nada para apagar não abestado" :(limpar()?"Deseja realmente apagar todas as tarefas concluídas? Não será possível a recuperação dos dados após serem excluídos.":"Deseja realmente apagar tudo? Não será possível a recuperação dos dados após o delete.")),
                                 actions: [
                                   TextButton(child: Text("Cancelar",
                                       style: TextStyle(color: Colors.green)), onPressed: (){
@@ -754,19 +688,19 @@ class _HomePageState extends State<HomePage> {
 
                                       setState(() {
                                         if(!limpar()){
-                                          tarefas.clear();
+                                          c.tarefas.clear();
                                         }
                                         else {
-                                          for(int i=0;i<tarefas.length;i++){
-                                            if(tarefas[i].concluida){
-                                              LastTask.add(tarefas[i]);
-                                              tarefas.removeAt(i);
+                                          for(int i=0;i<c.tarefas.length;i++){
+                                            if(c.tarefas[i].concluida){
+                                              c.LastTask.add(c.tarefas[i]);
+                                              c.tarefas.removeAt(i);
                                               i--;
                                             }
                                           }
                                         }
 
-                                        taskrepo.saveTaskList(tarefas);
+                                        c.taskrepo.saveTaskList(c.tarefas);
                                       });
                                     },)
                                 ]
