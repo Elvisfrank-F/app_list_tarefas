@@ -18,6 +18,11 @@ class TaskController {
   int get qtdTask => tarefas.length;
   final FocusNode focusNode = FocusNode();
 
+  //variaveis usadas para desfazer a delete
+
+  late TaskModel? LastDelete;
+  int LastDeletePos = 0;
+
   //controller para salvar a list
 
 TextEditingController controllerSalveList = new TextEditingController();
@@ -57,9 +62,7 @@ Future<void> carregarTema() async{
 
   int get qtsPendencia => tarefas.where((tarefa) => !tarefa.concluida).length;
 
-  //variáveis usadas para desfazer a delete
-  late TaskModel LastDelete;
-  int LastDeletePos = 0;
+
 
 // substituido
   bool limpar(){

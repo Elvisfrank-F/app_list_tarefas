@@ -1,7 +1,4 @@
 import 'package:flutter/material.dart';
-import 'package:tarefas/pages/home_page.dart';
-import 'package:tarefas/controllers/task_controller.dart';
-import 'package:flutter/material.dart';
 import 'package:tarefas/main.dart';
 import 'package:tarefas/repositories/task_repo.dart';
 import 'package:tarefas/models/task_model.dart';
@@ -9,34 +6,188 @@ import 'package:tarefas/wids/task.dart';
 import 'package:tarefas/wids/ListTaskWidget.dart';
 
 import 'package:tarefas/repositories/settings.dart';
-import 'package:tarefas/controllers/task_controller.dart';
 
 
-
-class CelpePage extends StatefulWidget {
-
-  final TaskController c;
-  const CelpePage({super.key, required this.c});
+class HomePage extends StatefulWidget {
+  const HomePage({super.key});
 
   @override
-  State<CelpePage> createState() => _CelpePageState();
+  State<HomePage> createState() => _HomePageState();
+
 }
 
-class _CelpePageState extends State<CelpePage> {
+class _HomePageState extends State<HomePage> {
+
+  //começo
+
+  List<TaskModel>tarefas = [];
+  List<Text>vazio = [Text("")];
+  TextEditingController _controller = TextEditingController();
+  int get qtdTask => tarefas.length;
+
+  final FocusNode _focusNode = FocusNode();
+
+  //controller para salvar a list
+
+  TextEditingController _controllerSalveList = TextEditingController();
+
+  //string para dizer o nome da lista
+
+  String? _nameList;
+  List<String?> _ListNameList = [];
+
+
+  //função que retorna a quantidade de atividades pendentes
+  int get qtsPendencia => tarefas.where((tarefa) => !tarefa.concluida).length;
+
+  //variáveis usadas para desfazer a delete
+  late TaskModel LastDelete;
+  int LastDeletePos = 0;
+
+  //lista usada para esfazer o limpar tudo
+
+  List<TaskModel> LastTask = [];
+
+  //instanciando o repositório para armazenagem e reciclagem de dados
+
+  TaskRepo taskrepo = TaskRepo("nulo");
+
+  //controller do texfield do editor de lista de lista de tarefas
+
+  TextEditingController _controllerEditListTask = TextEditingController();
+
+  //carregar tema
+
+  Future<void> carregarTema() async {
+    final isDark = await Settings.getDarkMode();
+    themeNotifier.value = isDark? ThemeMode.dark : ThemeMode.light;
+  }
+
+  //alterar o tema
+
+  Future<void> alterarTema() async {
+    final isDark = await Settings.getDarkMode();
+    themeNotifier.value = isDark ? ThemeMode.light : ThemeMode.dark;
+    await Settings.setDarkMode(!isDark);
+  }
+
+
+
+
+
+  @override
+  void initState(){
+    super.initState();
+    carregarTema();
+    TaskRepo.getList().then(
+            (value){
+          _ListNameList = value;
+          if(_ListNameList.isNotEmpty){
+            TaskRepo.getLastList().then((value){
+              setState(() {
+                _nameList = value;
+                taskrepo = TaskRepo(_nameList ?? "nulo");
+              });
+
+              taskrepo.getTaskList().then(
+                      (value){
+                    setState(() {
+                      tarefas = value;
+
+                      // if(tarefas.length>0){
+                      //   if(tarefas[0].isDark){
+                      //     themeNotifier.value = ThemeMode.dark;
+                      //   }
+                      // }
+
+
+                    });
+
+                  }
+              );
+
+            });
+
+          }
+          else {
+            TaskRepo.getLastList().then((value){
+              setState(() {
+                _nameList = value;
+                taskrepo = TaskRepo(_nameList ?? "nulo");
+
+                taskrepo.getTaskList().then(
+                        (value){
+                      setState(() {
+                        tarefas = value;
+
+                        // if(tarefas.length>0){
+                        //   if(tarefas[0].isDark){
+                        //     themeNotifier.value = ThemeMode.dark;
+                        //   }
+                        // }
+
+
+                      });
+
+                    }
+                );
+              });
+            });
+          }
+
+
+        }
+    );
+
+
+    //carregar o tema que o usuário escolheu
+
+
+
+
+    //carregar as tarefas antigas
+
+
+
+    if(tarefas.isNotEmpty) print("verificando se é true: ${tarefas[0].isDark}");
+    if(tarefas.isEmpty) print("ta vazio");
+
+
+  }
+
+
+
+  bool limpar(){
+    if(tarefas.length-qtsPendencia>0) {
+      return true;
+    }
+    else {
+      return false;
+    }
+
+  }
+
+  bool isDart(){
+
+    if(tarefas.isNotEmpty) print("verificando se é true ${tarefas[0].isDark}");
+
+    return themeNotifier.value == ThemeMode.dark;
+
+  }
+
 
 
 
   @override
   Widget build(BuildContext context) {
-    return  Scaffold(
+    return Scaffold(
       appBar:AppBar(
           title: FittedBox(
               fit: BoxFit.scaleDown,
-              child: Text("${widget.c.nameList}")),
+              child: Text("$_nameList")),
           centerTitle: true,
           actions: [ Row(
-            mainAxisAlignment:
-            MainAxisAlignment.spaceBetween,
+            mainAxisAlignment: MainAxisAlignment.spaceBetween,
             children: [
               Text(""),
               Row(
@@ -47,7 +198,7 @@ class _CelpePageState extends State<CelpePage> {
                       onPressed: (){
 
                         TaskRepo.getList().then((value){
-                          widget.c.ListNameList = value;
+                          _ListNameList = value;
                         });
 
                         showDialog(context: context, builder: (context){
@@ -63,18 +214,18 @@ class _CelpePageState extends State<CelpePage> {
                                     height: MediaQuery.of(context).size.width*0.5,
                                     child: ListView.builder(
                                       shrinkWrap: true,
-                                      itemCount: widget.c.ListNameList.length,
+                                      itemCount: _ListNameList.length,
                                       itemBuilder: (context, index){
                                         return GestureDetector(
 
                                           onTap: (){
 
                                             setState(() {
-                                              widget.c.nameList = widget.c.ListNameList[index];
-                                              widget.c.taskrepo = TaskRepo(widget.c.nameList);
+                                              _nameList = _ListNameList[index];
+                                              taskrepo = TaskRepo(_nameList);
                                             });
 
-                                            TaskRepo.setLastList(widget.c.ListNameList[index]!).then((value){
+                                            TaskRepo.setLastList(_ListNameList[index]!).then((value){
 
 
 
@@ -83,9 +234,9 @@ class _CelpePageState extends State<CelpePage> {
                                             setState(() {
 
                                             });
-                                            widget.c.taskrepo.getTaskList().then((value){
+                                            taskrepo.getTaskList().then((value){
                                               setState(() {
-                                                widget.c.tarefas = value;
+                                                tarefas = value;
                                               });
 
                                             });
@@ -94,7 +245,7 @@ class _CelpePageState extends State<CelpePage> {
 
                                           },
 
-                                          child: ListTaskWidget(text: widget.c.ListNameList[index]! , onDelete: (){
+                                          child: ListTaskWidget(text: _ListNameList[index]! , onDelete: (){
 
                                             showDialog(context: context, builder: (context){
 
@@ -102,7 +253,7 @@ class _CelpePageState extends State<CelpePage> {
                                                 content: Container(
                                                   // height: 100,
                                                   //   width: 100,
-                                                  child: Text("Deseja realmente excluir a lista de tarefas: \" ${widget.c.ListNameList[index]}\" ? ",
+                                                  child: Text("Deseja realmente excluir a lista de tarefas: \" ${_ListNameList[index]}\" ? ",
                                                       style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold)),
                                                 ),
                                                 actions: [
@@ -113,26 +264,26 @@ class _CelpePageState extends State<CelpePage> {
 
                                                     Navigator.pop(context);
 
-                                                    TaskRepo.deletarTarefa(widget.c.ListNameList[index]!).then((value){
+                                                    TaskRepo.deletarTarefa(_ListNameList[index]!).then((value){
                                                       setStateDialog((){
-                                                        widget.c.ListNameList.removeAt(index);
+                                                        _ListNameList.removeAt(index);
                                                         setState(() {
-                                                          if(widget.c.ListNameList.isNotEmpty) {
-                                                            widget.c.nameList = widget.c.ListNameList[0];
-                                                            widget.c.tarefas.clear();
-                                                            widget.c.taskrepo = TaskRepo(widget.c.nameList);
-                                                            widget.c.taskrepo.getTaskList().then((value){
+                                                          if(_ListNameList.isNotEmpty) {
+                                                            _nameList = _ListNameList[0];
+                                                            tarefas.clear();
+                                                            taskrepo = TaskRepo(_nameList);
+                                                            taskrepo.getTaskList().then((value){
                                                               setState(() {
-                                                                widget.c.tarefas = value;
+                                                                tarefas = value;
                                                               });
 
                                                             });
 
                                                           }
                                                           else {
-                                                            widget.c.nameList = "first_task";
-                                                            widget.c.tarefas.clear();
-                                                            widget.c.taskrepo = TaskRepo(widget.c.nameList);
+                                                            _nameList = "first_task";
+                                                            tarefas.clear();
+                                                            taskrepo = TaskRepo(_nameList);
 
                                                           }
                                                         });
@@ -172,7 +323,7 @@ class _CelpePageState extends State<CelpePage> {
                                                         Text("Mudar o nome da tarefa",
                                                             style: TextStyle(fontSize: 17, fontWeight: FontWeight.w300)),
                                                         TextField(
-                                                          controller: widget.c.controllerEditListTask,
+                                                          controller: _controllerEditListTask,
                                                           decoration: InputDecoration(
                                                               border: OutlineInputBorder(
                                                                   borderRadius: BorderRadius.circular(10)
@@ -192,33 +343,33 @@ class _CelpePageState extends State<CelpePage> {
 
                                                       Navigator.pop(context);
 
-                                                      await TaskRepo.renameList(widget.c.ListNameList[index]!, widget.c.controllerEditListTask.text);
+                                                      await TaskRepo.renameList(_ListNameList[index]!, _controllerEditListTask.text);
 
                                                       setState(() {
-                                                        widget.c.nameList = widget.c.controllerEditListTask.text;
+                                                        _nameList = _controllerEditListTask.text;
 
-                                                        widget.c.ListNameList[index] = widget.c.controllerEditListTask.text;
-                                                        widget.c.controllerEditListTask.text = "";
+                                                        _ListNameList[index] = _controllerEditListTask.text;
+                                                        _controllerEditListTask.text = "";
                                                       });
 
 
 
-                                                      await TaskRepo.setLastList(widget.c.ListNameList[index]!);
+                                                      await TaskRepo.setLastList(_ListNameList[index]!);
 
-                                                      widget.c.taskrepo = TaskRepo(widget.c.nameList);
+                                                      taskrepo = TaskRepo(_nameList);
 
-                                                      final lista = await widget.c.taskrepo.getTaskList();
+                                                      final lista = await taskrepo.getTaskList();
 
 
 
                                                       setStateDialog((){
 
-                                                        widget.c.tarefas = lista;
-                                                        //   widget.c.ListNameList = await taskrepo
+                                                        tarefas = lista;
+                                                        //   _ListNameList = await taskrepo
 
                                                       });
 
-                                                      widget.c.controllerEditListTask.clear();
+                                                      _controllerEditListTask.clear();
                                                       setState(() {
 
                                                       });
@@ -268,11 +419,11 @@ class _CelpePageState extends State<CelpePage> {
 
                               builder :  (context, setStateDialog) {
                                 return AlertDialog(
-                                  title: Text(widget.c.nameList == null
+                                  title: Text(_nameList == null
                                       ? "Dê um nome para sua lista de tarefas"
                                       : "Criar nova lista de tarefas"),
                                   content: TextField(
-                                    controller: widget.c.controllerSalveList,
+                                    controller: _controllerSalveList,
                                     decoration: InputDecoration(
                                       border: OutlineInputBorder(),
                                       label: Text("nome"),
@@ -293,13 +444,13 @@ class _CelpePageState extends State<CelpePage> {
                                         onPressed: () {
                                           Navigator.pop(context);
                                           setStateDialog(()  async{
-                                            if (widget.c.nameList == null) {
-                                              List<TaskModel> taf = widget.c.tarefas;
+                                            if (_nameList == null) {
+                                              List<TaskModel> taf = tarefas;
 
-                                              widget.c.nameList = widget.c.controllerSalveList.text;
-                                              widget.c.taskrepo = TaskRepo(widget.c.nameList);
-                                              widget.c.taskrepo.saveTaskList(taf);
-                                              TaskRepo.setLastList(widget.c.controllerSalveList.text).then((value){
+                                              _nameList = _controllerSalveList.text;
+                                              taskrepo = TaskRepo(_nameList);
+                                              taskrepo.saveTaskList(taf);
+                                              TaskRepo.setLastList(_controllerSalveList.text).then((value){
 
                                               });
 
@@ -308,35 +459,35 @@ class _CelpePageState extends State<CelpePage> {
 
 
                                               setState(() {
-                                                widget.c.nameList = widget.c.controllerSalveList.text;
-                                                widget.c.tarefas.clear();
+                                                _nameList = _controllerSalveList.text;
+                                                tarefas.clear();
                                               });
 
-                                              await TaskRepo.setLastList(widget.c.controllerSalveList.text);
+                                              await TaskRepo.setLastList(_controllerSalveList.text);
 
 
 
-                                              if(await TaskRepo.createList(widget.c.nameList!)){
-                                                widget.c.taskrepo = TaskRepo(widget.c.nameList);
+                                              if(await TaskRepo.createList(_nameList!)){
+                                                taskrepo = TaskRepo(_nameList);
 
                                               }
                                             }
-                                            final value = await widget.c.taskrepo.getTaskList();
+                                            final value = await taskrepo.getTaskList();
 
                                             setState(() {
-                                              widget.c.tarefas = value;
+                                              tarefas = value;
                                             });
 
                                             final listK = await TaskRepo.getList();
 
                                             setState(() {
-                                              widget.c.ListNameList = listK;
+                                              _ListNameList = listK;
                                             });
 
 
 
 
-                                            widget.c.controllerSalveList.text = "";
+                                            _controllerSalveList.text = "";
                                           });
                                           // Navigator.of(context).pop();
                                         },
@@ -352,7 +503,7 @@ class _CelpePageState extends State<CelpePage> {
                       },
                       child: Icon(Icons.save)),
                   SizedBox(width: 20,),
-                  widget.c.isDart()?Icon(Icons.bedtime):Icon(Icons.brightness_4),
+                  isDart()?Icon(Icons.bedtime):Icon(Icons.brightness_4),
                 ],
               ),
 
@@ -361,7 +512,7 @@ class _CelpePageState extends State<CelpePage> {
 
       ),
       onDrawerChanged: (context){
-        widget.c.focusNode.unfocus();
+        _focusNode.unfocus();
       },
 
       drawer: Drawer(
@@ -384,22 +535,22 @@ class _CelpePageState extends State<CelpePage> {
 
                       //icone que muda conforme o thema
 
-                      widget.c.isDart()?Icon(Icons.bedtime):Icon(Icons.brightness_4),
+                      isDart()?Icon(Icons.bedtime):Icon(Icons.brightness_4),
 
                       Switch(value: themeNotifier.value == ThemeMode.dark,
                           onChanged: (value){
-                            widget.c.alterarThema();
+                            alterarTema();
                             //themeNotifier.value = value ? ThemeMode.dark : ThemeMode.light;
-                            for(int i=0;i<widget.c.tarefas.length;i++){
-                              if(widget.c.isDart()){
-                                widget.c.tarefas[i].isDark = true;
+                            for(int i=0;i<tarefas.length;i++){
+                              if(isDart()){
+                                tarefas[i].isDark = true;
                               }
                               else {
-                                widget.c.tarefas[i].isDark = false;
+                                tarefas[i].isDark = false;
                               }
                             }
-                            widget.c.taskrepo.saveTaskList(widget.c.tarefas);
-                            widget.c.focusNode.unfocus();
+                            taskrepo.saveTaskList(tarefas);
+                            _focusNode.unfocus();
 
                           }),
 
@@ -425,7 +576,7 @@ class _CelpePageState extends State<CelpePage> {
               children: [
                 Container(
                   padding: EdgeInsets.all(10),
-                  child: Text(" Lista de Tarefas pé",
+                  child: Text(" Lista de Tarefas",
                       style:TextStyle(
                         fontSize: 35,
                         fontWeight: FontWeight.w700,
@@ -450,8 +601,8 @@ class _CelpePageState extends State<CelpePage> {
                           SizedBox(
                             width: MediaQuery.of(context).size.width * 0.5 ,
                             child: TextField(
-                              controller: widget.c.controllerNewTask,
-                              focusNode: widget.c.focusNode,
+                              controller: _controller,
+                              focusNode: _focusNode,
                               decoration: InputDecoration(
                                   label: Text("Adicione uma nova tarefa",
                                       style: TextStyle(fontSize: 15)),
@@ -462,10 +613,10 @@ class _CelpePageState extends State<CelpePage> {
 
                           ElevatedButton(
                               onPressed:(){
-                                TaskModel novaTask = TaskModel(text: widget.c.controllerNewTask.text, isDark: !widget.c.isDart());
+                                TaskModel novaTask = TaskModel(text: _controller.text, isDark: !isDart());
                                 print("tema: ${novaTask.isDark}");
                                 setState(() {
-                                  if(widget.c.controllerNewTask.text == "") {
+                                  if(_controller.text == "") {
                                     showDialog(
                                         context: context,
                                         builder: (context) {
@@ -495,11 +646,11 @@ class _CelpePageState extends State<CelpePage> {
                                         });
                                   }
                                   else {
-                                    widget.c.tarefas.add(novaTask);
-                                    widget.c.taskrepo.saveTaskList(widget.c.tarefas);
-                                    print(widget.c.tarefas.length);
-                                    widget.c.controllerNewTask.clear();
-                                    widget.c.focusNode.unfocus();
+                                    tarefas.add(novaTask);
+                                    taskrepo.saveTaskList(tarefas);
+                                    print(tarefas.length);
+                                    _controller.clear();
+                                    _focusNode.unfocus();
                                   }
                                 });
 
@@ -515,18 +666,18 @@ class _CelpePageState extends State<CelpePage> {
                 ),
                 SizedBox(height: 20,),
                 Expanded(
-                  child: widget.c.tarefas.isEmpty? Center(child: Text("Nenhuma tarefa"))
+                  child: tarefas.isEmpty? Center(child: Text("Nenhuma tarefa"))
                       : ListView.builder(
-                      itemCount: widget.c.tarefas.length,
+                      itemCount: tarefas.length,
                       itemBuilder: (context, index){
                         return Task(
-                          model: widget.c.tarefas[index],
+                          model: tarefas[index],
                           OnDelete: () {
-                            widget.c.LastDelete = widget.c.tarefas[index];
-                            widget.c.LastDeletePos = index;
+                            LastDelete = tarefas[index];
+                            LastDeletePos = index;
                             setState(() {
-                              widget.c.tarefas.removeAt(index);
-                              widget.c.taskrepo.saveTaskList(widget.c.tarefas);
+                              tarefas.removeAt(index);
+                              taskrepo.saveTaskList(tarefas);
                             });
 
                             ScaffoldMessenger.of(context).clearSnackBars();
@@ -534,7 +685,7 @@ class _CelpePageState extends State<CelpePage> {
 
                                 SnackBar(
                                     duration: Duration(seconds: 5),
-                                    content: Text("Sua tarefa ${widget.c.LastDelete!.text} foi excluída",
+                                    content: Text("Sua tarefa ${LastDelete.text} foi excluída",
                                         style: TextStyle(
                                           fontSize: 15,
                                         )),
@@ -542,14 +693,14 @@ class _CelpePageState extends State<CelpePage> {
                                       backgroundColor: Colors.transparent,
                                       onPressed: (){
                                         setState(() {
-                                          widget.c.tarefas.insert(widget.c.LastDeletePos, widget.c.LastDelete!);
-                                          widget.c.taskrepo.saveTaskList(widget.c.tarefas);
+                                          tarefas.insert(LastDeletePos, LastDelete);
+                                          taskrepo.saveTaskList(tarefas);
                                           // FocusScope.of(context).unfocus();
                                         });
 
                                       },
                                       label: "DESFAZER",
-                                      textColor: widget.c.isDart()?  const Color.fromARGB(255, 26, 5, 254) : const Color.fromARGB(255, 5, 245, 254),
+                                      textColor: isDart()?  const Color.fromARGB(255, 26, 5, 254) : const Color.fromARGB(255, 5, 245, 254),
 
                                     )
                                 )
@@ -557,11 +708,11 @@ class _CelpePageState extends State<CelpePage> {
                             );
                           },
                           OnEditing: (){
-                            widget.c.taskrepo.saveTaskList(widget.c.tarefas);
+                            taskrepo.saveTaskList(tarefas);
                           },
                           OnChaged: (){
                             setState(() {
-                              widget.c.taskrepo.saveTaskList(widget.c.tarefas);
+                              taskrepo.saveTaskList(tarefas);
                             });
                           },
 
@@ -570,9 +721,9 @@ class _CelpePageState extends State<CelpePage> {
                   ),
                 ),
                 Center(
-                  child: Text("Você possue ${widget.c.qtsPendencia} tarefas pendentes",
+                  child: Text("Você possue $qtsPendencia tarefas pendentes",
                     style: TextStyle(fontSize:16,
-                        color: widget.c.qtsPendencia>0?Colors.red:Colors.green),),
+                        color: qtsPendencia>0?Colors.red:Colors.green),),
                 ),
                 //SizedBox(width: 40,),
                 SizedBox(height: 20,),
@@ -586,10 +737,10 @@ class _CelpePageState extends State<CelpePage> {
                                 title: Row(
                                   children: [
                                     Icon(Icons.warning, color: Colors.amber),
-                                    Text(widget.c.tarefas.length==0?"Ta frescando é doido":(widget.c.limpar()?" - Apagar tarefas?":" - Apagar tudo?")),
+                                    Text(tarefas.length==0?"Ta frescando é doido":(limpar()?" - Apagar tarefas?":" - Apagar tudo?")),
                                   ],
                                 ),
-                                content: Text(widget.c.tarefas.length==0?"Tem nada para apagar não abestado" :(widget.c.limpar()?"Deseja realmente apagar todas as tarefas concluídas? Não será possível a recuperação dos dados após serem excluídos.":"Deseja realmente apagar tudo? Não será possível a recuperação dos dados após o delete.")),
+                                content: Text(tarefas.length==0?"Tem nada para apagar não abestado" :(limpar()?"Deseja realmente apagar todas as tarefas concluídas? Não será possível a recuperação dos dados após serem excluídos.":"Deseja realmente apagar tudo? Não será possível a recuperação dos dados após o delete.")),
                                 actions: [
                                   TextButton(child: Text("Cancelar",
                                       style: TextStyle(color: Colors.green)), onPressed: (){
@@ -602,20 +753,20 @@ class _CelpePageState extends State<CelpePage> {
                                       Navigator.of(context).pop();
 
                                       setState(() {
-                                        if(!widget.c.limpar()){
-                                          widget.c.tarefas.clear();
+                                        if(!limpar()){
+                                          tarefas.clear();
                                         }
                                         else {
-                                          for(int i=0;i<widget.c.tarefas.length;i++){
-                                            if(widget.c.tarefas[i].concluida){
-                                              widget.c.LastTask.add(widget.c.tarefas[i]);
-                                              widget.c.tarefas.removeAt(i);
+                                          for(int i=0;i<tarefas.length;i++){
+                                            if(tarefas[i].concluida){
+                                              LastTask.add(tarefas[i]);
+                                              tarefas.removeAt(i);
                                               i--;
                                             }
                                           }
                                         }
 
-                                        widget.c.taskrepo.saveTaskList(widget.c.tarefas);
+                                        taskrepo.saveTaskList(tarefas);
                                       });
                                     },)
                                 ]
@@ -624,7 +775,7 @@ class _CelpePageState extends State<CelpePage> {
 
 
                     },
-                    child: Text(widget.c.limpar()?"Limpar tarefas concluídas":"Limpar tudo",
+                    child: Text(limpar()?"Limpar tarefas concluídas":"Limpar tudo",
                         style: TextStyle(
                           color: Colors.white,
                           fontSize: 20,
