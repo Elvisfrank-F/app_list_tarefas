@@ -433,7 +433,7 @@ class _CelDeitadoPageState extends State<CelDeitadoPage> {
                      children: [
                        Container(
                          padding: MediaQuery.of(context).size.height > 400? EdgeInsets.all(10) :EdgeInsets.all(1) ,
-                         child: Text(" Lista de Tarefas deitado",
+                         child: Text(" Lista de Tarefas",
                              style:TextStyle(
                                fontSize:  MediaQuery.of(context).size.height > 400? 35:25,
                                fontWeight: FontWeight.w700,

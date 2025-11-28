@@ -425,7 +425,7 @@ class _CelpePageState extends State<CelpePage> {
               children: [
                 Container(
                   padding: EdgeInsets.all(10),
-                  child: Text(" Lista de Tarefas pé",
+                  child: Text(" Lista de Tarefas",
                       style:TextStyle(
                         fontSize: 35,
                         fontWeight: FontWeight.w700,
