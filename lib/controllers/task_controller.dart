@@ -53,6 +53,12 @@ Future<void> carregarTema() async{
   await Settings.setDarkMode(!isDark);
 }
 
+  int get qtsPendencia => tarefas.where((tarefa) => !tarefa.concluida).length;
+
+  //variáveis usadas para desfazer a delete
+  late TaskModel LastDelete;
+  int LastDeletePos = 0;
+
 
   bool limpar(){
     if(tarefas.length-qtsPendencia>0) {
