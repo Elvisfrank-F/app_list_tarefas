@@ -50,6 +50,7 @@ TextEditingController controllerNewTask = new TextEditingController(); //substit
   Future<void> alterarThema() async{
     final isDark = await Settings.getDarkMode();
     themeNotifier.value = isDark? ThemeMode.dark : ThemeMode.light;
+    await Settings.setDarkMode(!isDark);
   }
 
   //carregar tema
@@ -57,7 +58,7 @@ TextEditingController controllerNewTask = new TextEditingController(); //substit
 Future<void> carregarTema() async{
   final isDark = await Settings.getDarkMode();
   themeNotifier.value = isDark? ThemeMode.light : ThemeMode.dark;
-  await Settings.setDarkMode(!isDark);
+
 }
 
   int get qtsPendencia => tarefas.where((tarefa) => !tarefa.concluida).length;

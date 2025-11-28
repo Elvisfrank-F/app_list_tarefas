@@ -166,8 +166,8 @@ class _CelDeitadoPageState extends State<CelDeitadoPage> {
                                                     width: 400,
                                                     height: 100,
                                                     child: Column(
-                                                      mainAxisAlignment: MainAxisAlignment.center,
-                                                      crossAxisAlignment: CrossAxisAlignment.center,
+                                                    //  mainAxisAlignment: MainAxisAlignment.center,
+                                                     // crossAxisAlignment: CrossAxisAlignment.center,
                                                       children: [
                                                         Text("Mudar o nome da tarefa",
                                                             style: TextStyle(fontSize: 17, fontWeight: FontWeight.w300)),
@@ -417,103 +417,189 @@ class _CelDeitadoPageState extends State<CelDeitadoPage> {
             FocusScope.of(context).unfocus();
           },
           child: Container(
-            padding: EdgeInsets.all(10),
+            padding: MediaQuery.of(context).size.height > 400? EdgeInsets.all(10): EdgeInsets.all(1),
             child: Column(
               mainAxisAlignment:MainAxisAlignment.start,
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
-                Container(
-                  padding: EdgeInsets.all(10),
-                  child: Text(" Lista de Tarefas deitado",
-                      style:TextStyle(
-                        fontSize: 35,
-                        fontWeight: FontWeight.w700,
 
-                      )),
-                ),
                 SizedBox(height: 20,),
 
-                Center(
 
-                  child: Container(
-                      width: MediaQuery.of(context).size.width * 0.89,
-                      padding: EdgeInsets.all(10),
-                      decoration: BoxDecoration(
-                        border: Border.all(),
-                        borderRadius: BorderRadius.circular(15),
-                      ),
+               Row(
+                 children: [
+                   Column(
+                     mainAxisAlignment: MainAxisAlignment.spaceAround,
+                     children: [
+                       Container(
+                         padding: MediaQuery.of(context).size.height > 400? EdgeInsets.all(10) :EdgeInsets.all(1) ,
+                         child: Text(" Lista de Tarefas deitado",
+                             style:TextStyle(
+                               fontSize:  MediaQuery.of(context).size.height > 400? 35:25,
+                               fontWeight: FontWeight.w700,
 
-                      child: Row(
-                        mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                        children: [
-                          SizedBox(
-                            width: MediaQuery.of(context).size.width * 0.5 ,
-                            child: TextField(
-                              controller: widget.c.controllerNewTask,
-                              focusNode: widget.c.focusNode,
-                              decoration: InputDecoration(
-                                  label: Text("Adicione uma nova tarefa",
-                                      style: TextStyle(fontSize: 15)),
-                                  border: InputBorder.none
-                              ),
-                            ),
+                             )),
+                       ),
+                       Container(
+                          width: MediaQuery.of(context).size.width * 0.5,
+                          padding: EdgeInsets.all(10),
+                          decoration: BoxDecoration(
+                            border: Border.all(),
+                            borderRadius: BorderRadius.circular(15),
                           ),
 
-                          ElevatedButton(
-                              onPressed:(){
-                                TaskModel novaTask = TaskModel(text: widget.c.controllerNewTask.text, isDark: !widget.c.isDart());
-                                print("tema: ${novaTask.isDark}");
-                                setState(() {
-                                  if(widget.c.controllerNewTask.text == "") {
-                                    showDialog(
-                                        context: context,
-                                        builder: (context) {
+                          child: Row(
+                            mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                            children: [
+                              SizedBox(
+                                width: MediaQuery.of(context).size.width * 0.38 ,
+                                child: TextField(
+                                  controller: widget.c.controllerNewTask,
+                                  focusNode: widget.c.focusNode,
+                                  decoration: InputDecoration(
+                                      label: Text("Adicione uma nova tarefa",
+                                          style: TextStyle(fontSize: 15)),
+                                      border: InputBorder.none
+                                  ),
+                                ),
+                              ),
 
-                                          return AlertDialog(
-                                            title: Row(
-                                              children: [
-                                                Icon(Icons.error, color: Colors.red),
-                                                Text('  DÊ UM NOME',
+                              ElevatedButton(
+                                  onPressed:(){
+                                    TaskModel novaTask = TaskModel(text: widget.c.controllerNewTask.text, isDark: !widget.c.isDart());
+                                    print("tema: ${novaTask.isDark}");
+                                    setState(() {
+                                      if(widget.c.controllerNewTask.text == "") {
+                                        showDialog(
+                                            context: context,
+                                            builder: (context) {
+
+                                              return AlertDialog(
+                                                title: Row(
+                                                  children: [
+                                                    Icon(Icons.error, color: Colors.red),
+                                                    Text('  DÊ UM NOME',
+                                                        style: TextStyle(
+                                                            color: Colors.red,
+                                                            fontWeight: FontWeight.w800
+                                                        )),
+                                                  ],
+                                                ),
+                                                content: Text('Faz-se necessário colocar o nome da tarefa',
                                                     style: TextStyle(
-                                                        color: Colors.red,
-                                                        fontWeight: FontWeight.w800
+                                                      fontSize: 20,
                                                     )),
-                                              ],
-                                            ),
-                                            content: Text('Faz-se necessário colocar o nome da tarefa',
-                                                style: TextStyle(
-                                                  fontSize: 20,
-                                                )),
-                                            actions: [
-                                              TextButton(onPressed: () {
-                                                Navigator.of(context).pop();
-                                              }, child: Text("OK"),
-                                              ),
-                                            ],
-                                          );
-                                        });
-                                  }
-                                  else {
-                                    widget.c.tarefas.add(novaTask);
-                                    widget.c.taskrepo.saveTaskList(widget.c.tarefas);
-                                    print(widget.c.tarefas.length);
-                                    widget.c.controllerNewTask.clear();
-                                    widget.c.focusNode.unfocus();
-                                  }
-                                });
+                                                actions: [
+                                                  TextButton(onPressed: () {
+                                                    Navigator.of(context).pop();
+                                                  }, child: Text("OK"),
+                                                  ),
+                                                ],
+                                              );
+                                            });
+                                      }
+                                      else {
+                                        widget.c.tarefas.add(novaTask);
+                                        widget.c.taskrepo.saveTaskList(widget.c.tarefas);
+                                        print(widget.c.tarefas.length);
+                                        widget.c.controllerNewTask.clear();
+                                        widget.c.focusNode.unfocus();
+                                      }
+                                    });
 
-                              } ,
-                              child: Icon(Icons.add, size: 30, color:Colors.white),
-                              style: ElevatedButton.styleFrom(
-                                  shape: CircleBorder(),
-                                  padding: EdgeInsets.all(15),
-                                  backgroundColor: const Color.fromARGB(255, 0, 115, 255)
-                              ))
-                        ],
-                      )),
-                ),
+                                  } ,
+                                  child: Icon(Icons.add, size: 30, color:Colors.white),
+                                  style: ElevatedButton.styleFrom(
+                                      shape: CircleBorder(),
+                                      padding: EdgeInsets.all(15),
+                                      backgroundColor: const Color.fromARGB(255, 0, 115, 255)
+                                  ))
+                            ],
+                          )),
+
+                       MediaQuery.of(context).size.height> 550? SizedBox(height: MediaQuery.of(context).size.height * 0.4)
+                           :
+                       SizedBox(height: MediaQuery.of(context).size.height * 0.001)
+                       ,
+
+                       Center(
+                         child: Text("Você possue ${widget.c.qtsPendencia} tarefas pendentes",
+                           style: TextStyle(fontSize:16,
+                               color: widget.c.qtsPendencia>0?Colors.red:Colors.green),),
+                       ),
+                       //SizedBox(width: 40,),
+                       SizedBox(height: 20,),
+                       Center(
+                         child: ElevatedButton(
+                           onPressed: (){
+
+                             showDialog(context: context,
+                                 builder: (context) {
+                                   return AlertDialog(
+                                       title: Row(
+                                         children: [
+                                           Icon(Icons.warning, color: Colors.amber),
+                                           Text(widget.c.tarefas.length==0?"Ta frescando é doido":(widget.c.limpar()?" - Apagar tarefas?":" - Apagar tudo?")),
+                                         ],
+                                       ),
+                                       content: Text(widget.c.tarefas.length==0?"Tem nada para apagar não abestado" :(widget.c.limpar()?"Deseja realmente apagar todas as tarefas concluídas? Não será possível a recuperação dos dados após serem excluídos.":"Deseja realmente apagar tudo? Não será possível a recuperação dos dados após o delete.")),
+                                       actions: [
+                                         TextButton(child: Text("Cancelar",
+                                             style: TextStyle(color: Colors.green)), onPressed: (){
+                                           Navigator.of(context).pop();
+                                           FocusScope.of(context).requestFocus(FocusNode());
+                                         }),
+                                         TextButton(child: Text("Apagar",
+                                             style: TextStyle(color: Colors.red)),
+                                           onPressed: (){
+                                             Navigator.of(context).pop();
+
+                                             setState(() {
+                                               if(!widget.c.limpar()){
+                                                 widget.c.tarefas.clear();
+                                               }
+                                               else {
+                                                 for(int i=0;i<widget.c.tarefas.length;i++){
+                                                   if(widget.c.tarefas[i].concluida){
+                                                     widget.c.LastTask.add(widget.c.tarefas[i]);
+                                                     widget.c.tarefas.removeAt(i);
+                                                     i--;
+                                                   }
+                                                 }
+                                               }
+
+                                               widget.c.taskrepo.saveTaskList(widget.c.tarefas);
+                                             });
+                                           },)
+                                       ]
+                                   );
+                                 });
+
+
+                           },
+                           child: Text(widget.c.limpar()?"Limpar tarefas concluídas":"Limpar tudo",
+                               style: TextStyle(
+                                 color: Colors.white,
+                                 fontSize: 20,
+                               )),
+                           style: ElevatedButton.styleFrom(
+                               padding: EdgeInsets.symmetric(
+                                   horizontal:MediaQuery.of(context).size.width * 0.08 ,
+                                   vertical:MediaQuery.of(context).size.height >400?20:12 ),
+                               shape: RoundedRectangleBorder(
+                                 borderRadius: BorderRadius.circular(20),
+                               ),
+                               backgroundColor: const Color.fromARGB(255, 255, 179, 0)
+                           ),),
+                       ),
+                       SizedBox(height: 20,)
+                     ],
+                   ),
+
                 SizedBox(height: 20,),
-                Expanded(
+                Container(
+                  width: MediaQuery.of(context).size.width * 0.45,
+                  height: MediaQuery.of(context).size.height * 0.8,
                   child: widget.c.tarefas.isEmpty? Center(child: Text("Nenhuma tarefa"))
                       : ListView.builder(
                       itemCount: widget.c.tarefas.length,
@@ -567,77 +653,10 @@ class _CelDeitadoPageState extends State<CelDeitadoPage> {
                         );
                       }
                   ),
-                ),
-                Center(
-                  child: Text("Você possue ${widget.c.qtsPendencia} tarefas pendentes",
-                    style: TextStyle(fontSize:16,
-                        color: widget.c.qtsPendencia>0?Colors.red:Colors.green),),
-                ),
-                //SizedBox(width: 40,),
-                SizedBox(height: 20,),
-                Center(
-                  child: ElevatedButton(
-                    onPressed: (){
+                )
+          ]
+      ),
 
-                      showDialog(context: context,
-                          builder: (context) {
-                            return AlertDialog(
-                                title: Row(
-                                  children: [
-                                    Icon(Icons.warning, color: Colors.amber),
-                                    Text(widget.c.tarefas.length==0?"Ta frescando é doido":(widget.c.limpar()?" - Apagar tarefas?":" - Apagar tudo?")),
-                                  ],
-                                ),
-                                content: Text(widget.c.tarefas.length==0?"Tem nada para apagar não abestado" :(widget.c.limpar()?"Deseja realmente apagar todas as tarefas concluídas? Não será possível a recuperação dos dados após serem excluídos.":"Deseja realmente apagar tudo? Não será possível a recuperação dos dados após o delete.")),
-                                actions: [
-                                  TextButton(child: Text("Cancelar",
-                                      style: TextStyle(color: Colors.green)), onPressed: (){
-                                    Navigator.of(context).pop();
-                                    FocusScope.of(context).requestFocus(FocusNode());
-                                  }),
-                                  TextButton(child: Text("Apagar",
-                                      style: TextStyle(color: Colors.red)),
-                                    onPressed: (){
-                                      Navigator.of(context).pop();
-
-                                      setState(() {
-                                        if(!widget.c.limpar()){
-                                          widget.c.tarefas.clear();
-                                        }
-                                        else {
-                                          for(int i=0;i<widget.c.tarefas.length;i++){
-                                            if(widget.c.tarefas[i].concluida){
-                                              widget.c.LastTask.add(widget.c.tarefas[i]);
-                                              widget.c.tarefas.removeAt(i);
-                                              i--;
-                                            }
-                                          }
-                                        }
-
-                                        widget.c.taskrepo.saveTaskList(widget.c.tarefas);
-                                      });
-                                    },)
-                                ]
-                            );
-                          });
-
-
-                    },
-                    child: Text(widget.c.limpar()?"Limpar tarefas concluídas":"Limpar tudo",
-                        style: TextStyle(
-                          color: Colors.white,
-                          fontSize: 20,
-                        )),
-                    style: ElevatedButton.styleFrom(
-                        padding: EdgeInsets.symmetric(
-                            horizontal:MediaQuery.of(context).size.width * 0.08 , vertical: 20),
-                        shape: RoundedRectangleBorder(
-                          borderRadius: BorderRadius.circular(20),
-                        ),
-                        backgroundColor: const Color.fromARGB(255, 255, 179, 0)
-                    ),),
-                ),
-                SizedBox(height: 20,)
               ],
             ),
           ),
