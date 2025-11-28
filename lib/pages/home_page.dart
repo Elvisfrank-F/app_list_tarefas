@@ -257,7 +257,7 @@ class _HomePageState extends State<HomePage> {
                                                         Text("Mudar o nome da tarefa",
                                                             style: TextStyle(fontSize: 17, fontWeight: FontWeight.w300)),
                                                         TextField(
-                                                          controller: _controllerEditListTask,
+                                                          controller: c.controllerEditListTask,
                                                           decoration: InputDecoration(
                                                               border: OutlineInputBorder(
                                                                   borderRadius: BorderRadius.circular(10)
@@ -277,13 +277,13 @@ class _HomePageState extends State<HomePage> {
 
                                                       Navigator.pop(context);
 
-                                                      await TaskRepo.renameList(c.ListNameList[index]!, _controllerEditListTask.text);
+                                                      await TaskRepo.renameList(c.ListNameList[index]!, c.controllerEditListTask.text);
 
                                                       setState(() {
-                                                        c.nameList = _controllerEditListTask.text;
+                                                        c.nameList = c.controllerEditListTask.text;
 
-                                                        c.ListNameList[index] = _controllerEditListTask.text;
-                                                        _controllerEditListTask.text = "";
+                                                        c.ListNameList[index] = c.controllerEditListTask.text;
+                                                        c.controllerEditListTask.text = "";
                                                       });
 
 
@@ -303,7 +303,7 @@ class _HomePageState extends State<HomePage> {
 
                                                       });
 
-                                                      _controllerEditListTask.clear();
+                                                      c.controllerEditListTask.clear();
                                                       setState(() {
 
                                                       });
@@ -437,7 +437,7 @@ class _HomePageState extends State<HomePage> {
                       },
                       child: Icon(Icons.save)),
                   SizedBox(width: 20,),
-                  isDart()?Icon(Icons.bedtime):Icon(Icons.brightness_4),
+                  c.isDart()?Icon(Icons.bedtime):Icon(Icons.brightness_4),
                 ],
               ),
 
@@ -446,7 +446,7 @@ class _HomePageState extends State<HomePage> {
 
       ),
       onDrawerChanged: (context){
-        _focusNode.unfocus();
+        c.focusNode.unfocus();
       },
 
       drawer: Drawer(
@@ -469,14 +469,14 @@ class _HomePageState extends State<HomePage> {
 
                       //icone que muda conforme o thema
 
-                      isDart()?Icon(Icons.bedtime):Icon(Icons.brightness_4),
+                      c.isDart()?Icon(Icons.bedtime):Icon(Icons.brightness_4),
 
                       Switch(value: themeNotifier.value == ThemeMode.dark,
                           onChanged: (value){
                             c.alterarThema();
                             //themeNotifier.value = value ? ThemeMode.dark : ThemeMode.light;
                             for(int i=0;i<c.tarefas.length;i++){
-                              if(isDart()){
+                              if(c.isDart()){
                                 c.tarefas[i].isDark = true;
                               }
                               else {
@@ -484,7 +484,7 @@ class _HomePageState extends State<HomePage> {
                               }
                             }
                             c.taskrepo.saveTaskList(c.tarefas);
-                            _focusNode.unfocus();
+                            c.focusNode.unfocus();
 
                           }),
 
@@ -535,8 +535,8 @@ class _HomePageState extends State<HomePage> {
                           SizedBox(
                             width: MediaQuery.of(context).size.width * 0.5 ,
                             child: TextField(
-                              controller: _controller,
-                              focusNode: _focusNode,
+                              controller: c.controllerNewTask,
+                              focusNode: c.focusNode,
                               decoration: InputDecoration(
                                   label: Text("Adicione uma nova tarefa",
                                       style: TextStyle(fontSize: 15)),
@@ -547,10 +547,10 @@ class _HomePageState extends State<HomePage> {
 
                           ElevatedButton(
                               onPressed:(){
-                                TaskModel novaTask = TaskModel(text: _controller.text, isDark: !isDart());
+                                TaskModel novaTask = TaskModel(text: c.controllerNewTask.text, isDark: !c.isDart());
                                 print("tema: ${novaTask.isDark}");
                                 setState(() {
-                                  if(_controller.text == "") {
+                                  if(c.controllerNewTask.text == "") {
                                     showDialog(
                                         context: context,
                                         builder: (context) {
@@ -583,8 +583,8 @@ class _HomePageState extends State<HomePage> {
                                     c.tarefas.add(novaTask);
                                     c.taskrepo.saveTaskList(c.tarefas);
                                     print(c.tarefas.length);
-                                    _controller.clear();
-                                    _focusNode.unfocus();
+                                    c.controllerNewTask.clear();
+                                    c.focusNode.unfocus();
                                   }
                                 });
 
@@ -634,7 +634,7 @@ class _HomePageState extends State<HomePage> {
 
                                       },
                                       label: "DESFAZER",
-                                      textColor: isDart()?  const Color.fromARGB(255, 26, 5, 254) : const Color.fromARGB(255, 5, 245, 254),
+                                      textColor: c.isDart()?  const Color.fromARGB(255, 26, 5, 254) : const Color.fromARGB(255, 5, 245, 254),
 
                                     )
                                 )
@@ -671,10 +671,10 @@ class _HomePageState extends State<HomePage> {
                                 title: Row(
                                   children: [
                                     Icon(Icons.warning, color: Colors.amber),
-                                    Text(c.tarefas.length==0?"Ta frescando é doido":(limpar()?" - Apagar tarefas?":" - Apagar tudo?")),
+                                    Text(c.tarefas.length==0?"Ta frescando é doido":(c.limpar()?" - Apagar tarefas?":" - Apagar tudo?")),
                                   ],
                                 ),
-                                content: Text(c.tarefas.length==0?"Tem nada para apagar não abestado" :(limpar()?"Deseja realmente apagar todas as tarefas concluídas? Não será possível a recuperação dos dados após serem excluídos.":"Deseja realmente apagar tudo? Não será possível a recuperação dos dados após o delete.")),
+                                content: Text(c.tarefas.length==0?"Tem nada para apagar não abestado" :(c.limpar()?"Deseja realmente apagar todas as tarefas concluídas? Não será possível a recuperação dos dados após serem excluídos.":"Deseja realmente apagar tudo? Não será possível a recuperação dos dados após o delete.")),
                                 actions: [
                                   TextButton(child: Text("Cancelar",
                                       style: TextStyle(color: Colors.green)), onPressed: (){
@@ -687,7 +687,7 @@ class _HomePageState extends State<HomePage> {
                                       Navigator.of(context).pop();
 
                                       setState(() {
-                                        if(!limpar()){
+                                        if(!c.limpar()){
                                           c.tarefas.clear();
                                         }
                                         else {
@@ -709,7 +709,7 @@ class _HomePageState extends State<HomePage> {
 
 
                     },
-                    child: Text(limpar()?"Limpar tarefas concluídas":"Limpar tudo",
+                    child: Text(c.limpar()?"Limpar tarefas concluídas":"Limpar tudo",
                         style: TextStyle(
                           color: Colors.white,
                           fontSize: 20,

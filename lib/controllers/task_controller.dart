@@ -13,17 +13,19 @@ class TaskController {
 
   //começo
 
-  List<TaskModel> tarefas =[];
+  List<TaskModel> tarefas =[]; //substituido
   List<Text>vazio = [Text("")];
   int get qtdTask => tarefas.length;
-  final FocusNode _focusNode = FocusNode();
+  final FocusNode focusNode = FocusNode();
 
   //controller para salvar a list
 
-TextEditingController controllerSalveList = TextEditingController();
+TextEditingController controllerSalveList = new TextEditingController();
 
 //controller do texfiled do edit de lista de lista de tarefas
-TextEditingController controllerEditListTask = TextEditingController();
+TextEditingController controllerEditListTask = new TextEditingController();
+
+TextEditingController controllerNewTask = new TextEditingController(); //substituido
 
 //String para dizer o nome da lista
 
@@ -31,16 +33,16 @@ TextEditingController controllerEditListTask = TextEditingController();
 
   TaskRepo taskrepo = TaskRepo("nulo");
 
-  String? nameList;
-  List<String?> ListNameList = [];
+  String? nameList; //substituido
+  List<String?> ListNameList = []; // substituido
 
   //função usada para desfazer o limpar tudo;
 
-  List<TaskModel> LastTask = [];
+  List<TaskModel> LastTask = []; //substituido
 
 //alterar tema
 
-  Future<void> alterarTema() async{
+  Future<void> alterarThema() async{
     final isDark = await Settings.getDarkMode();
     themeNotifier.value = isDark? ThemeMode.dark : ThemeMode.light;
   }
@@ -59,7 +61,7 @@ Future<void> carregarTema() async{
   late TaskModel LastDelete;
   int LastDeletePos = 0;
 
-
+// substituido
   bool limpar(){
     if(tarefas.length-qtsPendencia>0) {
       return true;
@@ -69,6 +71,8 @@ Future<void> carregarTema() async{
     }
 
   }
+
+  //substituido
 
   bool isDart(){
 
