@@ -26,7 +26,6 @@ class _HomePageState extends State<HomePage> {
 
   TaskController c = TaskController();
 
-
   @override
   void initState(){
     super.initState();
