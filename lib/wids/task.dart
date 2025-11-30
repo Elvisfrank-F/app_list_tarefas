@@ -3,6 +3,7 @@ import 'package:intl/intl.dart';
 import 'package:flutter_slidable/flutter_slidable.dart';
 import 'package:tarefas/models/task_model.dart';
 
+//widget da tarefa
 
 class Task extends StatefulWidget {
   // ignore: non_constant_identifier_names

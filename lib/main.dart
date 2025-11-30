@@ -5,7 +5,6 @@ import 'package:tarefas/pages/home_page.dart';
 
 final ValueNotifier<ThemeMode> themeNotifier = ValueNotifier(ThemeMode.light);
 
-String? _nameList;
 
 void main() async{
 
