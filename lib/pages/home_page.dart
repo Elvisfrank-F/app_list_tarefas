@@ -1,13 +1,7 @@
 import 'package:flutter/material.dart';
-import 'package:tarefas/main.dart';
 import 'package:tarefas/pages/stateMobile/celDeltado_page.dart';
 import 'package:tarefas/pages/stateMobile/celPe_page.dart';
 import 'package:tarefas/repositories/task_repo.dart';
-import 'package:tarefas/models/task_model.dart';
-import 'package:tarefas/wids/task.dart';
-import 'package:tarefas/wids/ListTaskWidget.dart';
-
-import 'package:tarefas/repositories/settings.dart';
 import 'package:tarefas/controllers/task_controller.dart';
 
 
@@ -24,12 +18,17 @@ class _HomePageState extends State<HomePage> {
 
   //começo
 
+  //classe criada para guardar o estado de todas as variáveis usadas no projeto
+  //e poder passar-las por parãmetro para classe filhas
   TaskController c = TaskController();
 
   @override
   void initState(){
     super.initState();
-    c.carregarTema();
+    c.carregarTema(); //carregar o tema com o shared preferences
+
+    //função que busca a lista salva no repositório
+
     TaskRepo.getList().then(
             (value){
           c.ListNameList = value;
@@ -115,6 +114,8 @@ class _HomePageState extends State<HomePage> {
 
   @override
   Widget build(BuildContext context) {
+
+    //widget que verifica se o celular tá em ṕé ou deitado
 
     return OrientationBuilder(
 

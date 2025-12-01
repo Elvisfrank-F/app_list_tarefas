@@ -7,7 +7,7 @@ class TaskModel{
    bool isDark;
    String? time;
 
-   TaskModel({String? time, 
+   TaskModel({String? time,
    required this.text,
    this.isDark = false,
    this.concluida = false}) : time = time ?? DateFormat('dd/MM/yyyy - HH:mm').format(DateTime.now());
