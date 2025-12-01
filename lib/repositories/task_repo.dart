@@ -5,11 +5,14 @@ import 'package:path_provider/path_provider.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import 'package:tarefas/models/task_model.dart';
 
+//classe usada para armazenar os dados do app
+
 class TaskRepo{
 
-String? arqList;
-static final String arqLastList = "lastList";
+String? arqList; //nome do arquivo da lista em questão
+static final String arqLastList = "lastList"; //nome do arquivo que irá salvar o nome da ultima lista usada antes de fechar o app
 
+//o construtor da classe recebe o nome do arquivo que se deseja buscar os dados (tarefas)
   TaskRepo(String? a) {
     this.arqList = a;
   }
@@ -28,6 +31,8 @@ static final String arqLastList = "lastList";
   void saveTaskList(List<TaskModel> tarefas) {
     _saveData(tarefas);
   }
+
+  //função para buscar o repositorio ou criar caso não exista
 
   Future<File> _getFile() async{
 

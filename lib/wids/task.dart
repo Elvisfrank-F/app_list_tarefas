@@ -7,10 +7,10 @@ import 'package:tarefas/models/task_model.dart';
 
 class Task extends StatefulWidget {
   // ignore: non_constant_identifier_names
-  final void Function()? OnDelete;
-  final void Function()? OnChaged;
-  final void Function()? OnEditing;
-  final TaskModel model;
+  final void Function()? OnDelete; //função para deletar a tarefa
+  final void Function()? OnChaged; //função para quando clicar na tarefa (nunca usada)
+  final void Function()? OnEditing; //funçãoa para editar a terefa
+  final TaskModel model; //modelo de dados da terefa
 
   const Task({
     super.key,
