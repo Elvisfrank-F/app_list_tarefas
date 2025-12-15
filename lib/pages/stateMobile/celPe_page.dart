@@ -1,5 +1,7 @@
 import 'package:cached_network_image/cached_network_image.dart';
+import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
+import 'package:google_sign_in/google_sign_in.dart';
 import 'package:tarefas/pages/home_page.dart';
 import 'package:tarefas/controllers/task_controller.dart';
 import 'package:flutter/material.dart';
@@ -31,6 +33,9 @@ class _CelpePageState extends State<CelpePage> {
 
   @override
   Widget build(BuildContext context) {
+
+    bool isDark = Theme.of(context).brightness == Brightness.dark;
+
     return  Scaffold(
       appBar:AppBar(
           title: FittedBox(
@@ -368,26 +373,29 @@ class _CelpePageState extends State<CelpePage> {
       },
 
       drawer: Drawer(
-        child: Column(
+        child: ListView(
 
 
           children: [
 
             UserAccountsDrawerHeader(
-                accountName: Text(widget.c.userAuth!.displayName ?? "Sem nome"),
-                accountEmail: Text(widget.c.userAuth!.email ?? "test@gmail.com"),
+                accountName: Text(widget.c.userAuth?.displayName ?? "Sem nome"),
+                accountEmail: Text(widget.c.userAuth?.email ?? "test@gmail.com"),
                currentAccountPicture: CircleAvatar(
-                 backgroundImage: widget.c.userAuth!.photoURL != null? CachedNetworkImageProvider(widget.c.userAuth!.photoURL!):AssetImage("assets/images/person.jpeg")
+                 backgroundImage: widget.c.userAuth?.photoURL != null? CachedNetworkImageProvider(widget.c.userAuth?.photoURL ?? ''):AssetImage("assets/images/person.jpeg") as ImageProvider
                ),
 
             ),
 
 
-            Padding(
-              padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 30),
+            widget.c.userAuth == null? Padding(
+              padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 2),
               child: Card(
 
-                color: Colors.grey,
+                color: isDark? Color.fromRGBO(50, 50, 50, 1.0):
+
+                Color.fromRGBO(
+                    209, 209, 209, 1.0) ,
                 child: GestureDetector(
                   child: SizedBox(
                     height: 70,
@@ -396,7 +404,7 @@ class _CelpePageState extends State<CelpePage> {
                       mainAxisAlignment: MainAxisAlignment.spaceAround,
                       children: [
                         SizedBox(width: 5,),
-                        Text("FAÇA LOGIN",
+                        Text("LOGIN",
                             style: TextStyle(fontSize: 20) ),
 
                         //icone que muda conforme o thema
@@ -419,14 +427,57 @@ class _CelpePageState extends State<CelpePage> {
                   },
                 ),
               ),
-            ),
+            ) : SizedBox(),
+            widget.c.userAuth != null? Padding(
+              padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 2),
+              child: Card(
+
+                color: isDark? Color.fromRGBO(50, 50, 50, 1.0): Color.fromRGBO(
+                    209, 209, 209, 1.0) ,
+                child: GestureDetector(
+                  child: SizedBox(
+                    height: 70,
+                    width: double.infinity,
+                    child: Row(
+                      mainAxisAlignment: MainAxisAlignment.spaceAround,
+                      children: [
+                        SizedBox(width: 5,),
+                        Text("LOGOUT",
+                            style: TextStyle(fontSize: 20) ),
+
+                        //icone que muda conforme o thema
+
+                        Icon(Icons.logout)
+
+
+                      ],
+                    ),
+                  ),
+                  onTap: () async {
+
+                    await FirebaseAuth.instance.signOut();
+
+                    try{
+                      await GoogleSignIn().signOut();
+                    }catch(_){}
+
+                    setState(() {
+
+                    });
+
+                  },
+                ),
+              ),
+            ) : SizedBox(),
+
 
 
             Padding(
-              padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 30),
+              padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 2),
               child: Card(
 
-                color: Colors.grey,
+                color: isDark? Color.fromRGBO(50, 50, 50, 1.0): Color.fromRGBO(
+                    209, 209, 209, 1.0) ,
                 child: SizedBox(
                   height: 70,
                   width: double.infinity,

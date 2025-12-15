@@ -25,7 +25,7 @@ class TaskController {
 
   //
 
-  final userAuth = FirebaseAuth.instance.currentUser;
+  User? get userAuth => FirebaseAuth.instance.currentUser;
 
   //variaveis usadas para desfazer a delete
 
