@@ -39,6 +39,27 @@ dependencies:
   cupertino_icons: ^1.0.8
   path_provider: ^2.1.5
 
+  # Firebase Core (OBRIGATÓRIO)
+  firebase_core: ^3.6.0
+
+  # Firebase Authentication (para login Google)
+  firebase_auth: ^5.3.3
+
+  # Firestore
+  cloud_firestore: ^5.4.4
+
+  # Login Google nativo
+  google_sign_in: ^6.2.1
+
+  # App Check (PROTEÇÃO do app)
+  firebase_app_check: ^0.3.0+3
+
+  cached_network_image: ^3.4.1
+
+
+
+
+
 dev_dependencies:
   flutter_launcher_icons: "^0.14.4"
   flutter_test:
