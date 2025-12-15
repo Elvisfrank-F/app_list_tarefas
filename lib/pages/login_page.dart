@@ -13,12 +13,16 @@ class LoginPage extends StatefulWidget {
 class _LoginPageState extends State<LoginPage> {
   @override
   Widget build(BuildContext context) {
+
+    bool isDark = Theme.of(context).brightness == Brightness.dark;
+
     return Scaffold(
       appBar: AppBar(),
       body: Center(
         child: Card(
           elevation: 100,
-          color: Color.fromRGBO(48, 48, 48, 1.0),
+          color: isDark? Color.fromRGBO(48, 48, 48, 1.0) :Color.fromRGBO(
+              204, 204, 204, 1.0) ,
           child: Container(
             padding: EdgeInsets.all(10),
 
