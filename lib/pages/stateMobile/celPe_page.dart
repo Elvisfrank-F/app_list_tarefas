@@ -1,4 +1,5 @@
 import 'package:cached_network_image/cached_network_image.dart';
+import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 import 'package:google_sign_in/google_sign_in.dart';
@@ -48,7 +49,10 @@ class _CelpePageState extends State<CelpePage> {
             children: [
               Text(""),
               Row(
+                mainAxisAlignment: MainAxisAlignment.spaceAround,
                 children: [
+
+
 
                   IconButton(
 
@@ -266,7 +270,7 @@ class _CelpePageState extends State<CelpePage> {
                           );
                         });
 
-                      }, icon: Icon(Icons.download)),
+                      }, icon: Icon(Icons.save)),
 
                   GestureDetector(
                       onTap:(){
@@ -358,9 +362,9 @@ class _CelpePageState extends State<CelpePage> {
                         });
 
                       },
-                      child: Icon(Icons.save)),
-                  SizedBox(width: 20,),
-                  widget.c.isDart()?Icon(Icons.bedtime):Icon(Icons.brightness_4),
+                      child: Icon(Icons.add)),
+                   SizedBox(width: 20,),
+                  //widget.c.isDart()?Icon(Icons.bedtime):Icon(Icons.brightness_4),
                 ],
               ),
 
@@ -466,6 +470,89 @@ class _CelpePageState extends State<CelpePage> {
                     });
 
                   },
+                ),
+              ),
+            ) : SizedBox(),
+
+            widget.c.userAuth != null? Padding(
+              padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 2),
+              child: Card(
+
+                color: isDark? Color.fromRGBO(50, 50, 50, 1.0): Color.fromRGBO(
+                    209, 209, 209, 1.0) ,
+                child: GestureDetector(
+                  child: SizedBox(
+                    height: 70,
+                    width: double.infinity,
+                    child: Row(
+                      mainAxisAlignment: MainAxisAlignment.spaceAround,
+                      children: [
+                        SizedBox(width: 5,),
+                        Text("BAIXAR TAREFAS",
+                            style: TextStyle(fontSize: 20) ),
+
+                        //icone que muda conforme o thema
+
+                        Icon(Icons.cloud_download)
+
+
+                      ],
+                    ),
+                  ),
+                  onTap: () async {
+
+
+
+                  },
+                ),
+              ),
+            ) : SizedBox(),
+
+            widget.c.userAuth != null? Padding(
+              padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 2),
+              child: Card(
+
+                color: isDark? Color.fromRGBO(50, 50, 50, 1.0): Color.fromRGBO(
+                    209, 209, 209, 1.0) ,
+                child: GestureDetector(
+                  child: SizedBox(
+                    height: 70,
+                    width: double.infinity,
+                    child: Row(
+                      mainAxisAlignment: MainAxisAlignment.spaceAround,
+                      children: [
+                        SizedBox(width: 5,),
+                        Text("ENVIAR PARA NUVEM",
+                            style: TextStyle(fontSize: 20) ),
+
+                        //icone que muda conforme o thema
+
+                        Icon(Icons.cloud_upload)
+
+
+                      ],
+                    ),
+                  ),
+                  onTap: () async {
+                    List<String> lista = await TaskRepo.getList();
+
+                    final batch = FirebaseFirestore.instance.batch();
+                    final uid = widget.c.userAuth!.uid;
+
+                    for(var nomeLista in lista){
+
+                      List<TaskModel> tarefas = await TaskRepo(nomeLista).getTaskList();
+
+                      for(var task in tarefas){
+
+                        final ref = FirebaseFirestore.instance.collection("users").doc(uid).collection("tasks").doc(nomeLista);
+
+                        batch.set(ref, task.toJson());
+
+                      }
+                    }
+                    await batch.commit();
+                  }
                 ),
               ),
             ) : SizedBox(),

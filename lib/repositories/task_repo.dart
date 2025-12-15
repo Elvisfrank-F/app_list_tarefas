@@ -32,6 +32,22 @@ static final String arqLastList = "lastList"; //nome do arquivo que irá salvar 
     _saveData(tarefas);
   }
 
+  Future<String> _readData() async{
+    try{
+      final file = await _getFile();
+
+      if(await file.exists()) {
+        return file.readAsString();
+      }
+      else {
+        return "[]";
+      }
+    }
+    catch(e) {
+      return "[]";
+    }
+  }
+
   //função para buscar o repositorio ou criar caso não exista
 
   Future<File> _getFile() async{
@@ -73,21 +89,9 @@ static final String arqLastList = "lastList"; //nome do arquivo que irá salvar 
     return file.writeAsString(data);
   }
 
-  Future<String> _readData() async{
-    try{
-      final file = await _getFile();
 
-      if(await file.exists()) {
-        return file.readAsString();
-      }
-      else {
-        return "[]";
-      }
-    }
-    catch(e) {
-      return "[]";
-    }
-  }
+
+  //deletar tarefa
 
  static Future<void> deletarTarefa(String arquivo) async{
     final directory = await getApplicationDocumentsDirectory();
@@ -103,6 +107,8 @@ static final String arqLastList = "lastList"; //nome do arquivo que irá salvar 
       return;
     }
   }
+
+  //criar nova lista
 
   static Future<bool> createList(String list) async{
     final documents = await getApplicationDocumentsDirectory();
@@ -120,6 +126,8 @@ static final String arqLastList = "lastList"; //nome do arquivo que irá salvar 
 
   }
 
+  //renomear lista
+
   static Future<void> renameList(String OldName, String NewName) async {
     final directory = await getApplicationDocumentsDirectory();
     File fila = File("${directory.path}/taskDir/$OldName.json");
@@ -135,6 +143,9 @@ static final String arqLastList = "lastList"; //nome do arquivo que irá salvar 
   //
   //
   // }
+
+  //utima lista para carregar os abrir o app novamente
+
 
 static Future<void> setLastList(String lastList) async{
     final shared = await SharedPreferences.getInstance();
