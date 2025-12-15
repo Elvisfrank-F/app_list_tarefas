@@ -1,0 +1,54 @@
+{
+  "project_info": {
+    "project_number": "413774704344",
+    "project_id": "lista-tarefas-f8e24",
+    "storage_bucket": "lista-tarefas-f8e24.firebasestorage.app"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:413774704344:android:c709c3942638c059b771ad",
+        "android_client_info": {
+          "package_name": "com.example.tarefas"
+        }
+      },
+      "oauth_client": [
+        {
+          "client_id": "413774704344-773o94uqra494pkp899tj5f3omovcpn8.apps.googleusercontent.com",
+          "client_type": 1,
+          "android_info": {
+            "package_name": "com.example.tarefas",
+            "certificate_hash": "34423a476041d31652bcbcae805388946454bc27"
+          }
+        },
+        {
+          "client_id": "413774704344-kck3ijmhabr0cl3skuk0f1a6f9c9p9ss.apps.googleusercontent.com",
+          "client_type": 3
+        }
+      ],
+      "api_key": [
+        {
+          "current_key": "AIzaSyDoC1uzgT_A0S4AMcwLOdw_9JlSyyWYF_M"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": [
+            {
+              "client_id": "413774704344-kck3ijmhabr0cl3skuk0f1a6f9c9p9ss.apps.googleusercontent.com",
+              "client_type": 3
+            },
+            {
+              "client_id": "413774704344-kf4jmlej0nq60ccb9nh0gbm27le15tuq.apps.googleusercontent.com",
+              "client_type": 2,
+              "ios_info": {
+                "bundle_id": "com.example.tarefas"
+              }
+            }
+          ]
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}

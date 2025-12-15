@@ -1,3 +1,4 @@
+import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/material.dart';
 import 'package:tarefas/main.dart';
@@ -17,6 +18,14 @@ class TaskController {
   List<Text>vazio = [Text("")];
   int get qtdTask => tarefas.length;
   final FocusNode focusNode = FocusNode();
+
+  //usuario autenticado
+
+  UserCredential? user = null;
+
+  //
+
+  final userAuth = FirebaseAuth.instance.currentUser;
 
   //variaveis usadas para desfazer a delete
 

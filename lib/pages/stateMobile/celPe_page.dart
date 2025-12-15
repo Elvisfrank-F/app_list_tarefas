@@ -1,8 +1,10 @@
+import 'package:cached_network_image/cached_network_image.dart';
 import 'package:flutter/material.dart';
 import 'package:tarefas/pages/home_page.dart';
 import 'package:tarefas/controllers/task_controller.dart';
 import 'package:flutter/material.dart';
 import 'package:tarefas/main.dart';
+import 'package:tarefas/pages/login_page.dart';
 import 'package:tarefas/repositories/task_repo.dart';
 import 'package:tarefas/models/task_model.dart';
 import 'package:tarefas/wids/task.dart';
@@ -23,6 +25,7 @@ class CelpePage extends StatefulWidget {
 }
 
 class _CelpePageState extends State<CelpePage> {
+
 
 
 
@@ -371,15 +374,54 @@ class _CelpePageState extends State<CelpePage> {
           children: [
 
             UserAccountsDrawerHeader(
-                accountName: Text("example"),
-                accountEmail: Text("example@gmail.com"),
+                accountName: Text(widget.c.userAuth!.displayName ?? "Sem nome"),
+                accountEmail: Text(widget.c.userAuth!.email ?? "test@gmail.com"),
                currentAccountPicture: CircleAvatar(
-                 backgroundImage: AssetImage("assets/images/person.jpeg"),
+                 backgroundImage: widget.c.userAuth!.photoURL != null? CachedNetworkImageProvider(widget.c.userAuth!.photoURL!):AssetImage("assets/images/person.jpeg")
                ),
 
-            )
+            ),
 
-            ,
+
+            Padding(
+              padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 30),
+              child: Card(
+
+                color: Colors.grey,
+                child: GestureDetector(
+                  child: SizedBox(
+                    height: 70,
+                    width: double.infinity,
+                    child: Row(
+                      mainAxisAlignment: MainAxisAlignment.spaceAround,
+                      children: [
+                        SizedBox(width: 5,),
+                        Text("FAÇA LOGIN",
+                            style: TextStyle(fontSize: 20) ),
+
+                        //icone que muda conforme o thema
+
+                        Icon(Icons.login)
+
+
+                      ],
+                    ),
+                  ),
+                  onTap: () async {
+                   final user = await Navigator.push(context, MaterialPageRoute(builder: (context) => LoginPage()));
+
+                   if(user != null){
+                     setState(() {
+                       widget.c.user = user;
+                     });
+                   }
+
+                  },
+                ),
+              ),
+            ),
+
+
             Padding(
               padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 30),
               child: Card(
