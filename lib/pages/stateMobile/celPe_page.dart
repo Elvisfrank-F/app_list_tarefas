@@ -366,7 +366,20 @@ class _CelpePageState extends State<CelpePage> {
 
       drawer: Drawer(
         child: Column(
+
+
           children: [
+
+            UserAccountsDrawerHeader(
+                accountName: Text("example"),
+                accountEmail: Text("example@gmail.com"),
+               currentAccountPicture: CircleAvatar(
+                 backgroundImage: AssetImage("assets/images/person.jpeg"),
+               ),
+
+            )
+
+            ,
             Padding(
               padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 30),
               child: Card(
