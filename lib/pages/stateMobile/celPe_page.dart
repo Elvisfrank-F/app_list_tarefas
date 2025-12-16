@@ -581,22 +581,16 @@ class _CelpePageState extends State<CelpePage> {
 
                       //icone que muda conforme o thema
 
-                      widget.c.isDart()?Icon(Icons.bedtime):Icon(Icons.brightness_4),
+                      isDark?Icon(Icons.bedtime):Icon(Icons.brightness_4),
 
-                      Switch(value: themeNotifier.value == ThemeMode.dark,
+                      Switch(value: isDark,
                           onChanged: (value){
-                            widget.c.alterarThema();
-                            //themeNotifier.value = value ? ThemeMode.dark : ThemeMode.light;
-                            for(int i=0;i<widget.c.tarefas.length;i++){
-                              if(widget.c.isDart()){
-                                widget.c.tarefas[i].isDark = true;
-                              }
-                              else {
-                                widget.c.tarefas[i].isDark = false;
-                              }
-                            }
-                            widget.c.taskrepo.saveTaskList(widget.c.tarefas);
-                            widget.c.focusNode.unfocus();
+                         setState(() {
+                           widget.c.alterarThema();
+                           isDark = value;
+                         });
+
+
 
                           }),
 
@@ -659,8 +653,8 @@ class _CelpePageState extends State<CelpePage> {
 
                           ElevatedButton(
                               onPressed:(){
-                                TaskModel novaTask = TaskModel(text: widget.c.controllerNewTask.text, isDark: !widget.c.isDart());
-                                print("tema: ${novaTask.isDark}");
+                                TaskModel novaTask = TaskModel(text: widget.c.controllerNewTask.text);
+                               // print("tema: ${novaTask.isDark}");
                                 setState(() {
                                   if(widget.c.controllerNewTask.text == "") {
                                     showDialog(

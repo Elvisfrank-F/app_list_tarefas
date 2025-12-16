@@ -99,8 +99,8 @@ class _HomePageState extends State<HomePage> {
 
 
 
-    if(c.tarefas.isNotEmpty) print("verificando se é true: ${c.tarefas[0].isDark}");
-    if(c.tarefas.isEmpty) print("ta vazio");
+    // if(c.tarefas.isNotEmpty) print("verificando se é true: ${c.tarefas[0].isDark}");
+    // if(c.tarefas.isEmpty) print("ta vazio");
 
 
   }

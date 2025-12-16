@@ -89,7 +89,7 @@ Future<void> carregarTema() async{
 
   bool isDart(){
 
-    if(tarefas.isNotEmpty) print("verificando se é true ${tarefas[0].isDark}");
+    //if(tarefas.isNotEmpty) print("verificando se é true ${tarefas[0].isDark}");
 
     return themeNotifier.value == ThemeMode.dark;
 
