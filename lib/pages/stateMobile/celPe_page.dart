@@ -400,7 +400,7 @@ class _CelpePageState extends State<CelpePage> {
 
                 Color.fromRGBO(
                     209, 209, 209, 1.0) ,
-                child: GestureDetector(
+                child: InkWell(
                   child: SizedBox(
                     height: 70,
                     width: double.infinity,
@@ -428,6 +428,10 @@ class _CelpePageState extends State<CelpePage> {
                      });
                    }
 
+                   setState(() {
+
+                   });
+
                   },
                 ),
               ),
@@ -438,7 +442,7 @@ class _CelpePageState extends State<CelpePage> {
 
                 color: isDark? Color.fromRGBO(50, 50, 50, 1.0): Color.fromRGBO(
                     209, 209, 209, 1.0) ,
-                child: GestureDetector(
+                child: InkWell(
                   child: SizedBox(
                     height: 70,
                     width: double.infinity,
@@ -480,7 +484,7 @@ class _CelpePageState extends State<CelpePage> {
 
                 color: isDark? Color.fromRGBO(50, 50, 50, 1.0): Color.fromRGBO(
                     209, 209, 209, 1.0) ,
-                child: GestureDetector(
+                child:InkWell(
                   child: SizedBox(
                     height: 70,
                     width: double.infinity,
