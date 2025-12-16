@@ -23,6 +23,14 @@ class TaskController {
 
   UserCredential? user = null;
 
+  //eniar para nuvem
+
+  bool isUpload = false;
+
+  //fazer downlaod
+
+  bool isDownload = false;
+
   //
 
   User? get userAuth => FirebaseAuth.instance.currentUser;

@@ -146,6 +146,13 @@ static final String arqLastList = "lastList"; //nome do arquivo que irá salvar 
 
   //utima lista para carregar os abrir o app novamente
 
+  void setArqList(String a){
+    arqList = a;
+  }
+  String? getArqList(){
+    return arqList;
+  }
+
 
 static Future<void> setLastList(String lastList) async{
     final shared = await SharedPreferences.getInstance();
@@ -156,6 +163,8 @@ static Future<String> getLastList() async{
     final shared = await SharedPreferences.getInstance();
     return  shared.getString(arqLastList) ?? "sem arquivo";
 }
+
+
 
 
 

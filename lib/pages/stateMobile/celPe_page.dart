@@ -512,13 +512,80 @@ class _CelpePageState extends State<CelpePage> {
 
                         //icone que muda conforme o thema
 
-                        Icon(Icons.cloud_download)
+                        widget.c.isDownload? SizedBox(width: 24, height: 24,
+
+                          child: CircularProgressIndicator(
+                            strokeWidth: 3,
+                          )
+
+                          ,):Icon(Icons.cloud_download)
 
 
                       ],
                     ),
                   ),
                   onTap: () async {
+
+                    setState(() {
+                      widget.c.isDownload = true;
+                    });
+
+                    //List<String> lista = await TaskRepo.getList();
+
+                    final batch = FirebaseFirestore.instance.batch();
+                    final uid = widget.c.userAuth!.uid;
+
+                    final snapshots = await FirebaseFirestore.instance
+                        .collection(
+                        "users")
+                        .
+                    doc(uid)
+                        .collection("tasks").get();
+
+                    final List lista = snapshots.docs.map((e)=> e.id).toList();
+
+
+                    for(var name in lista) {
+
+                      final doc = await FirebaseFirestore.instance.collection("users").
+                    doc(widget.c.userAuth!.uid).collection("tasks").doc(name).get();
+
+
+                      final List tarefasJson = doc.data()?["tarefas"] ?? [];
+
+                      List<TaskModel>tarefas = tarefasJson.map((e)=> TaskModel.fromJson(e)).toList();
+
+                      if(name == lista.last){
+                        setState(() {
+                          widget.c.tarefas = tarefas;
+                          widget.c.nameList = name;
+                        });
+
+                      }
+                        widget.c.taskrepo.setArqList(name);
+                        widget.c.taskrepo.saveTaskList(tarefas);
+
+
+                      print(name);
+                      for(var l in tarefas) {
+
+                        print("");
+                        print(l.toString());
+                        print("");
+                      }
+                      print("");
+                      print("");
+                      print("");
+                      print("");
+                      print("");
+                      print("");
+
+                    }
+
+                    setState(() {
+                      widget.c.isDownload= false;
+                      Navigator.pop(context);
+                    });
 
 
 
@@ -546,31 +613,102 @@ class _CelpePageState extends State<CelpePage> {
 
                         //icone que muda conforme o thema
 
-                        Icon(Icons.cloud_upload)
+                       widget.c.isUpload? SizedBox(width: 24, height: 24
+
+                           ,
+                           child: CircularProgressIndicator(
+                             strokeWidth: 2,
+                           )
+                           ,):Icon(Icons.cloud_upload)
 
 
                       ],
                     ),
                   ),
                   onTap: () async {
-                    List<String> lista = await TaskRepo.getList();
+                    setState(() {
+                      widget.c.isUpload= true;
+                    });
 
-                    final batch = FirebaseFirestore.instance.batch();
-                    final uid = widget.c.userAuth!.uid;
+                    showDialog(context: context, builder: (context){
 
-                    for(var nomeLista in lista){
+                      return AlertDialog(
+                        title: Row(
+                          mainAxisAlignment: MainAxisAlignment.start,
+                          children: [
+                            IconButton(onPressed: (){Navigator.pop(context);}, icon: Icon(Icons.arrow_back)),
+                            Text("UPLOAD DE ARQUIVOS", style: TextStyle(fontSize: 20),),
+                          ],
+                        ),
+                        content: Text("Deseja enviar todos os arquivos ou apenas a tarefa atual?"),
 
-                      List<TaskModel> tarefas = await TaskRepo(nomeLista).getTaskList();
+                        actions: [
+                         // TextButton(child: Text("CANCELAR"), onPressed: (){},),
+                          TextButton(child: Text("ATUAL"), onPressed: () async {
 
-                      for(var task in tarefas){
+                            Navigator.pop(context);
 
-                        final ref = FirebaseFirestore.instance.collection("users").doc(uid).collection("tasks").doc(nomeLista);
 
-                        batch.set(ref, task.toJson());
+                            List<TaskModel> tarefas =  widget.c.tarefas;
+                            final batch = FirebaseFirestore.instance.batch();
+                            final uid = widget.c.userAuth!.uid;
 
-                      }
-                    }
-                    await batch.commit();
+
+
+
+                              final ref = FirebaseFirestore.instance.collection("users").doc(uid).collection("tasks").doc(widget.c.nameList);
+
+                              batch.set(ref, {
+                                "tarefas": tarefas.map((e) => e.toJson()).toList(),
+                              });
+
+
+                            await batch.commit();
+                            setState(() {
+                              widget.c.isUpload = false;
+                            });
+
+
+
+
+                          },),
+                          TextButton(child: Text("TODOS"), onPressed: () async{
+
+
+
+                            Navigator.pop(context);
+
+
+                            List<String> lista = await TaskRepo.getList();
+
+                            final batch = FirebaseFirestore.instance.batch();
+                            final uid = widget.c.userAuth!.uid;
+
+                            for(var nomeLista in lista){
+
+                              List<TaskModel> tarefas = await TaskRepo(nomeLista).getTaskList();
+
+
+                                final ref = FirebaseFirestore.instance.collection("users").doc(uid).collection("tasks").doc(nomeLista);
+
+                                batch.set(ref, {
+                                  "tarefas" : tarefas.map( (e) => e.toJson()).toList()
+                                });
+
+
+                            }
+                            await batch.commit();
+                            setState(() {
+                              widget.c.isUpload = false;
+
+                            });
+                          },),
+                        ],
+                      );
+
+                    });
+
+
                   }
                 ),
               ),

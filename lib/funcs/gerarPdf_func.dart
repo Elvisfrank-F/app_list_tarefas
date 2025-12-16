@@ -33,10 +33,9 @@ class GerarpdfFunc {
                    child: pw.Column(
                        children: [
                          pw.Text("${_controller!.nameList!.toUpperCase()}", style: pw.TextStyle(fontSize: 30, fontWeight: pw.FontWeight.bold)),
-
                          pw.SizedBox(height: 40),
                          pw.Divider(thickness: 1),
-                         pw.Divider(thickness: 1),
+                       //  pw.Divider(thickness: 1),
 
                          ..._controller!.tarefas.map((t) {
 

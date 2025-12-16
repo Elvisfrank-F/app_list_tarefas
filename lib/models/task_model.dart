@@ -34,4 +34,15 @@ String get tarefaName{
 
 }
 
+
+// Método para reescrever o comportamento padrão de impressão do objeto
+  @override
+  String toString() {
+    return 'TaskModel {'
+        'text: $text, '
+        'concluida: $concluida, '
+        'time: $time'
+        '}';
+  }
+
 }

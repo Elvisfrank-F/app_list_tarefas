@@ -1,10 +1,16 @@
+import 'package:cached_network_image/cached_network_image.dart';
+import 'package:cloud_firestore/cloud_firestore.dart';
+import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
+import 'package:google_sign_in/google_sign_in.dart';
 import 'package:tarefas/pages/home_page.dart';
 import 'package:tarefas/controllers/task_controller.dart';
 import 'package:flutter/material.dart';
 import 'package:tarefas/main.dart';
+import 'package:tarefas/pages/login_page.dart';
 import 'package:tarefas/repositories/task_repo.dart';
 import 'package:tarefas/models/task_model.dart';
+import 'package:tarefas/wids/pdf_view_page_pdf.dart';
 import 'package:tarefas/wids/task.dart';
 import 'package:tarefas/wids/ListTaskWidget.dart';
 
@@ -44,7 +50,24 @@ class _CelDeitadoPageState extends State<CelDeitadoPage> {
             children: [
               Text(""),
               Row(
+                mainAxisAlignment: MainAxisAlignment.spaceAround,
                 children: [
+
+
+                  IconButton(icon: Icon(Icons.picture_as_pdf), onPressed:() async{
+
+                    List<String> tar = [];
+
+                    for(int i=0;i<widget.c.tarefas.length;i++){
+
+                      tar.add(widget.c.tarefas[i].tarefaName);
+
+                    }
+
+                    Navigator.push(context,
+                        MaterialPageRoute(builder: (context) => PdfViewPagePdf(controller: widget.c)));
+
+                  }),
 
                   IconButton(
 
@@ -170,8 +193,8 @@ class _CelDeitadoPageState extends State<CelDeitadoPage> {
                                                     width: 400,
                                                     height: 100,
                                                     child: Column(
-                                                    //  mainAxisAlignment: MainAxisAlignment.center,
-                                                     // crossAxisAlignment: CrossAxisAlignment.center,
+                                                      mainAxisAlignment: MainAxisAlignment.center,
+                                                      crossAxisAlignment: CrossAxisAlignment.center,
                                                       children: [
                                                         Text("Mudar o nome da tarefa",
                                                             style: TextStyle(fontSize: 17, fontWeight: FontWeight.w300)),
@@ -262,7 +285,7 @@ class _CelDeitadoPageState extends State<CelDeitadoPage> {
                           );
                         });
 
-                      }, icon: Icon(Icons.download)),
+                      }, icon: Icon(Icons.save)),
 
                   GestureDetector(
                       onTap:(){
@@ -354,9 +377,9 @@ class _CelDeitadoPageState extends State<CelDeitadoPage> {
                         });
 
                       },
-                      child: Icon(Icons.save)),
+                      child: Icon(Icons.add)),
                   SizedBox(width: 20,),
-                  widget.c.isDart()?Icon(Icons.bedtime):Icon(Icons.brightness_4),
+                  //widget.c.isDart()?Icon(Icons.bedtime):Icon(Icons.brightness_4),
                 ],
               ),
 
@@ -369,12 +392,336 @@ class _CelDeitadoPageState extends State<CelDeitadoPage> {
       },
 
       drawer: Drawer(
-        child: Column(
+        child: ListView(
+
+
           children: [
-            Padding(
-              padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 30),
+
+            UserAccountsDrawerHeader(
+              accountName: Text(widget.c.userAuth?.displayName ?? "Sem nome"),
+              accountEmail: Text(widget.c.userAuth?.email ?? "test@gmail.com"),
+              currentAccountPicture: CircleAvatar(
+                  backgroundImage: widget.c.userAuth?.photoURL != null? CachedNetworkImageProvider(widget.c.userAuth?.photoURL ?? ''):AssetImage("assets/images/person.jpeg") as ImageProvider
+              ),
+
+            ),
+
+
+            widget.c.userAuth == null? Padding(
+              padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 2),
               child: Card(
-                color: Colors.grey,
+
+                color: isDark? Color.fromRGBO(50, 50, 50, 1.0):
+
+                Color.fromRGBO(
+                    209, 209, 209, 1.0) ,
+                child: InkWell(
+                  child: SizedBox(
+                    height: 70,
+                    width: double.infinity,
+                    child: Row(
+                      mainAxisAlignment: MainAxisAlignment.spaceAround,
+                      children: [
+                        SizedBox(width: 5,),
+                        Text("LOGIN",
+                            style: TextStyle(fontSize: 20) ),
+
+                        //icone que muda conforme o thema
+
+                        Icon(Icons.login)
+
+
+                      ],
+                    ),
+                  ),
+                  onTap: () async {
+                    final user = await Navigator.push(context, MaterialPageRoute(builder: (context) => LoginPage()));
+
+                    if(user != null){
+                      setState(() {
+                        widget.c.user = user;
+                      });
+                    }
+
+                    setState(() {
+
+                    });
+
+                  },
+                ),
+              ),
+            ) : SizedBox(),
+            widget.c.userAuth != null? Padding(
+              padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 2),
+              child: Card(
+
+                color: isDark? Color.fromRGBO(50, 50, 50, 1.0): Color.fromRGBO(
+                    209, 209, 209, 1.0) ,
+                child: InkWell(
+                  child: SizedBox(
+                    height: 70,
+                    width: double.infinity,
+                    child: Row(
+                      mainAxisAlignment: MainAxisAlignment.spaceAround,
+                      children: [
+                        SizedBox(width: 5,),
+                        Text("LOGOUT",
+                            style: TextStyle(fontSize: 20) ),
+
+                        //icone que muda conforme o thema
+
+                        Icon(Icons.logout)
+
+
+                      ],
+                    ),
+                  ),
+                  onTap: () async {
+
+                    await FirebaseAuth.instance.signOut();
+
+                    try{
+                      await GoogleSignIn().signOut();
+                    }catch(_){}
+
+                    setState(() {
+
+                    });
+
+                  },
+                ),
+              ),
+            ) : SizedBox(),
+
+            widget.c.userAuth != null? Padding(
+              padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 2),
+              child: Card(
+
+                color: isDark? Color.fromRGBO(50, 50, 50, 1.0): Color.fromRGBO(
+                    209, 209, 209, 1.0) ,
+                child:InkWell(
+                  child: SizedBox(
+                    height: 70,
+                    width: double.infinity,
+                    child: Row(
+                      mainAxisAlignment: MainAxisAlignment.spaceAround,
+                      children: [
+                        SizedBox(width: 5,),
+                        Text("BAIXAR TAREFAS",
+                            style: TextStyle(fontSize: 20) ),
+
+                        //icone que muda conforme o thema
+
+                        widget.c.isDownload? SizedBox(width: 24, height: 24,
+
+                          child: CircularProgressIndicator(
+                            strokeWidth: 3,
+                          )
+
+                          ,):Icon(Icons.cloud_download)
+
+
+                      ],
+                    ),
+                  ),
+                  onTap: () async {
+
+                    setState(() {
+                      widget.c.isDownload = true;
+                    });
+
+                    //List<String> lista = await TaskRepo.getList();
+
+                    final batch = FirebaseFirestore.instance.batch();
+                    final uid = widget.c.userAuth!.uid;
+
+                    final snapshots = await FirebaseFirestore.instance
+                        .collection(
+                        "users")
+                        .
+                    doc(uid)
+                        .collection("tasks").get();
+
+                    final List lista = snapshots.docs.map((e)=> e.id).toList();
+
+
+                    for(var name in lista) {
+
+                      final doc = await FirebaseFirestore.instance.collection("users").
+                      doc(widget.c.userAuth!.uid).collection("tasks").doc(name).get();
+
+
+                      final List tarefasJson = doc.data()?["tarefas"] ?? [];
+
+                      List<TaskModel>tarefas = tarefasJson.map((e)=> TaskModel.fromJson(e)).toList();
+
+                      if(name == lista.last){
+                        setState(() {
+                          widget.c.tarefas = tarefas;
+                          widget.c.nameList = name;
+                        });
+
+                      }
+                      widget.c.taskrepo.setArqList(name);
+                      widget.c.taskrepo.saveTaskList(tarefas);
+
+
+                      print(name);
+                      for(var l in tarefas) {
+
+                        print("");
+                        print(l.toString());
+                        print("");
+                      }
+                      print("");
+                      print("");
+                      print("");
+                      print("");
+                      print("");
+                      print("");
+
+                    }
+
+                    setState(() {
+                      widget.c.isDownload= false;
+                      Navigator.pop(context);
+                    });
+
+
+
+                  },
+                ),
+              ),
+            ) : SizedBox(),
+
+            widget.c.userAuth != null? Padding(
+              padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 2),
+              child: Card(
+
+                color: isDark? Color.fromRGBO(50, 50, 50, 1.0): Color.fromRGBO(
+                    209, 209, 209, 1.0) ,
+                child: GestureDetector(
+                    child: SizedBox(
+                      height: 70,
+                      width: double.infinity,
+                      child: Row(
+                        mainAxisAlignment: MainAxisAlignment.spaceAround,
+                        children: [
+                          SizedBox(width: 5,),
+                          Text("ENVIAR PARA NUVEM",
+                              style: TextStyle(fontSize: 20) ),
+
+                          //icone que muda conforme o thema
+
+                          widget.c.isUpload? SizedBox(width: 24, height: 24
+
+                            ,
+                            child: CircularProgressIndicator(
+                              strokeWidth: 2,
+                            )
+                            ,):Icon(Icons.cloud_upload)
+
+
+                        ],
+                      ),
+                    ),
+                    onTap: () async {
+                      setState(() {
+                        widget.c.isUpload= true;
+                      });
+
+                      showDialog(context: context, builder: (context){
+
+                        return AlertDialog(
+                          title: Row(
+                            mainAxisAlignment: MainAxisAlignment.start,
+                            children: [
+                              IconButton(onPressed: (){Navigator.pop(context);}, icon: Icon(Icons.arrow_back)),
+                              Text("UPLOAD DE ARQUIVOS", style: TextStyle(fontSize: 20),),
+                            ],
+                          ),
+                          content: Text("Deseja enviar todos os arquivos ou apenas a tarefa atual?"),
+
+                          actions: [
+                            // TextButton(child: Text("CANCELAR"), onPressed: (){},),
+                            TextButton(child: Text("ATUAL"), onPressed: () async {
+
+                              Navigator.pop(context);
+
+
+                              List<TaskModel> tarefas =  widget.c.tarefas;
+                              final batch = FirebaseFirestore.instance.batch();
+                              final uid = widget.c.userAuth!.uid;
+
+
+
+
+                              final ref = FirebaseFirestore.instance.collection("users").doc(uid).collection("tasks").doc(widget.c.nameList);
+
+                              batch.set(ref, {
+                                "tarefas": tarefas.map((e) => e.toJson()).toList(),
+                              });
+
+
+                              await batch.commit();
+                              setState(() {
+                                widget.c.isUpload = false;
+                              });
+
+
+
+
+                            },),
+                            TextButton(child: Text("TODOS"), onPressed: () async{
+
+
+
+                              Navigator.pop(context);
+
+
+                              List<String> lista = await TaskRepo.getList();
+
+                              final batch = FirebaseFirestore.instance.batch();
+                              final uid = widget.c.userAuth!.uid;
+
+                              for(var nomeLista in lista){
+
+                                List<TaskModel> tarefas = await TaskRepo(nomeLista).getTaskList();
+
+
+                                final ref = FirebaseFirestore.instance.collection("users").doc(uid).collection("tasks").doc(nomeLista);
+
+                                batch.set(ref, {
+                                  "tarefas" : tarefas.map( (e) => e.toJson()).toList()
+                                });
+
+
+                              }
+                              await batch.commit();
+                              setState(() {
+                                widget.c.isUpload = false;
+
+                              });
+                            },),
+                          ],
+                        );
+
+                      });
+
+
+                    }
+                ),
+              ),
+            ) : SizedBox(),
+
+
+
+            Padding(
+              padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 2),
+              child: Card(
+
+                color: isDark? Color.fromRGBO(50, 50, 50, 1.0): Color.fromRGBO(
+                    209, 209, 209, 1.0) ,
                 child: SizedBox(
                   height: 70,
                   width: double.infinity,
@@ -387,16 +734,16 @@ class _CelDeitadoPageState extends State<CelDeitadoPage> {
 
                       //icone que muda conforme o thema
 
-                      widget.c.isDart()?Icon(Icons.bedtime):Icon(Icons.brightness_4),
+                      isDark?Icon(Icons.bedtime):Icon(Icons.brightness_4),
 
                       Switch(value: isDark,
                           onChanged: (value){
-                            widget.c.alterarThema();
-                            //themeNotifier.value = value ? ThemeMode.dark : ThemeMode.light;
+                            setState(() {
+                              widget.c.alterarThema();
+                              isDark = value;
+                            });
 
-                           setState(() {
-                             isDark = value;
-                           });
+
 
                           }),
 
