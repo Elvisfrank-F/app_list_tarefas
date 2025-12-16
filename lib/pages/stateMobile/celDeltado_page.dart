@@ -28,6 +28,10 @@ class _CelDeitadoPageState extends State<CelDeitadoPage> {
 
   @override
   Widget build(BuildContext context) {
+
+    bool isDark = Theme.of(context).brightness == Brightness.dark;
+
+
     return  Scaffold(
       appBar:AppBar(
           title: FittedBox(
@@ -385,20 +389,14 @@ class _CelDeitadoPageState extends State<CelDeitadoPage> {
 
                       widget.c.isDart()?Icon(Icons.bedtime):Icon(Icons.brightness_4),
 
-                      Switch(value: themeNotifier.value == ThemeMode.dark,
+                      Switch(value: isDark,
                           onChanged: (value){
                             widget.c.alterarThema();
                             //themeNotifier.value = value ? ThemeMode.dark : ThemeMode.light;
-                            for(int i=0;i<widget.c.tarefas.length;i++){
-                              if(widget.c.isDart()){
-                                widget.c.tarefas[i].isDark = true;
-                              }
-                              else {
-                                widget.c.tarefas[i].isDark = false;
-                              }
-                            }
-                            widget.c.taskrepo.saveTaskList(widget.c.tarefas);
-                            widget.c.focusNode.unfocus();
+
+                           setState(() {
+                             isDark = value;
+                           });
 
                           }),
 
@@ -466,8 +464,8 @@ class _CelDeitadoPageState extends State<CelDeitadoPage> {
 
                               ElevatedButton(
                                   onPressed:(){
-                                    TaskModel novaTask = TaskModel(text: widget.c.controllerNewTask.text, isDark: !widget.c.isDart());
-                                    print("tema: ${novaTask.isDark}");
+                                    TaskModel novaTask = TaskModel(text: widget.c.controllerNewTask.text);
+                                   // print("tema: ${novaTask.isDark}");
                                     setState(() {
                                       if(widget.c.controllerNewTask.text == "") {
                                         showDialog(
