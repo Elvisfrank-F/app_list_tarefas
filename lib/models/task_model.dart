@@ -28,4 +28,10 @@ Map<String, dynamic> toJson(){
   };
 }
 
+String get tarefaName{
+
+  return text;
+
+}
+
 }

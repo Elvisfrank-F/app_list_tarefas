@@ -10,6 +10,7 @@ import 'package:tarefas/main.dart';
 import 'package:tarefas/pages/login_page.dart';
 import 'package:tarefas/repositories/task_repo.dart';
 import 'package:tarefas/models/task_model.dart';
+import 'package:tarefas/wids/pdf_view_page_pdf.dart';
 import 'package:tarefas/wids/task.dart';
 import 'package:tarefas/wids/ListTaskWidget.dart';
 
@@ -53,6 +54,20 @@ class _CelpePageState extends State<CelpePage> {
                 children: [
 
 
+                   IconButton(icon: Icon(Icons.picture_as_pdf), onPressed:() async{
+
+                     List<String> tar = [];
+
+                     for(int i=0;i<widget.c.tarefas.length;i++){
+
+                       tar.add(widget.c.tarefas[i].tarefaName);
+
+                     }
+
+                     Navigator.push(context,
+                     MaterialPageRoute(builder: (context) => PdfViewPagePdf(controller: widget.c)));
+
+                   }),
 
                   IconButton(
 
